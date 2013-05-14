@@ -9,13 +9,21 @@
 				[
 					new TaskWithClosure(
 						function() {
-							console.log( "Custom task being run: " + this.id );
-						} ),
+							console.log( "Custom task being run: " + this.id + ", " + this.taskIdentifier );
+						}, "First task" ),
 					new TaskWithClosure(
 						function() {
-							console.log( "Custom task being run: " + this.id );
-						} )
-					] );
+							console.log( "Custom task being run: " + this.id + ", " + this.taskIdentifier );
+						}, "Second task" )
+					] ).
+				withCompleteHandler(
+					function() {
+						console.log( "CompositeTask complete: " + task.id );
+					} ).
+				withStartHandler(
+					function() {
+						console.log( "CompositeTask started: " + task.id );
+					} );
 		task.run();
 	</script>
 </body>

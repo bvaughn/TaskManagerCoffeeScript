@@ -1,5 +1,10 @@
 class TaskWithClosure extends Task
-    constructor: (@closure) ->
-        super
-    customRun: ->
-        @closure()
+
+  constructor: ( @customRunFunction, @_autoCompleteAfterRunningFunction = false, @_taskIdentifier ) ->
+    super( @_taskIdentifier )
+
+  customRun: ->
+    @customRunFunction()
+
+    if @_autoCompleteAfterRunningFunction
+      @taskComplete()
