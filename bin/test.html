@@ -1,0 +1,22 @@
+<html>
+<head>
+</head>
+<body>
+	<script type="text/javascript" src="task_manager.js"></script>
+	<script type="text/javascript">
+		var task =
+			new CompositeTask(
+				[
+					new TaskWithClosure(
+						function() {
+							console.log( "Custom task being run: " + this.id );
+						} ),
+					new TaskWithClosure(
+						function() {
+							console.log( "Custom task being run: " + this.id );
+						} )
+					] );
+		task.run();
+	</script>
+</body>
+</html>
