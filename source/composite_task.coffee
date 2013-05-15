@@ -1,11 +1,12 @@
 class CompositeTask extends Task
-  _addTasksBeforeRunInvoked: false
-  _erroredTasks: []
-  _flushTaskQueueLock: false
-  _taskQueueIndex: 0
 
   constructor: ( @_taskQueue = [], @_executeTaskInParallel = true, @_taskIdentifier ) ->
     super( @_taskIdentifier )
+
+    @_addTasksBeforeRunInvoked = false
+    @_erroredTasks = []
+    @_flushTaskQueueLock = false
+    @_taskQueueIndex = 0
 
   customRun: ->
     if !@_addTasksBeforeRunInvoked
@@ -13,6 +14,7 @@ class CompositeTask extends Task
       @_addTasksBeforeRunInvoked = true
 
     if @_taskQueue.length == 0 || @allTasksAreCompleted
+      console.log "No task or all are completed"
       @taskComplete()
       return
     
@@ -90,9 +92,9 @@ class CompositeTask extends Task
   ###
 
   addTaskEventListeners: (task) ->
-    task.withCompleteHandler( @_individualTaskCompleted )
-    task.withErrorHandler( @_individualTaskCompleteded )
-    task.withStartHandler( @_individualTaskStarted )
+    task.withCompleteHandler( @wrapper( @_individualTaskCompleted ) )
+    task.withErrorHandler( @wrapper( @_individualTaskCompleteded ) )
+    task.withStartHandler( @wrapper( @_individualTaskStarted ) )
 
   checkForTaskCompletion: ->
     if @_flushTaskQueueLock
@@ -107,7 +109,7 @@ class CompositeTask extends Task
       @taskComplete()
 
   handleTaskCompletedOrRemoved: (task) ->
-    removeTaskEventListeners( task )
+    @removeTaskEventListeners( task )
 
     # If this Task was removed before completion, don't call the Task-complete hook.
     if task.isComplete
@@ -119,6 +121,15 @@ class CompositeTask extends Task
     if !@running
       return
 
+    if @handleTaskCompletedOrRemoved
+      @checkForTaskCompletion()
+    else
+      if @currentSerialTask
+        @currentSerialTask.run()
+      else
+        @checkForTaskCompletion()
+
+  # TODO: This doesn't actually work currently because of the @wrapper logic
   removeTaskEventListeners: (task) ->
     task.removeCompleteHandler( @_individualTaskCompleted )
     task.removeErrorHandler( @_individualTaskCompleteded )
@@ -129,7 +140,6 @@ class CompositeTask extends Task
   ###
 
   _individualTaskCompleted: (task) ->
-    console.log "This: " + this + ", id: " + @id + ", task: " + task + ", task.id: " + task.id
     @handleTaskCompletedOrRemoved( task )
 
   _individualTaskErrored: (task) ->

@@ -4,32 +4,31 @@ Function::property = (prop, desc) ->
 
 class Task extends EventDispatcher
   @uid: 0
-
-  _id: 0
-  _data: null
-  _message: null
-
-  # State variables
-  _completed:    false
-  _errored:     false
-  _interrupted: false
-  _running:     false
-
-  # State change counters
-  _numTimesCompleted:   0
-  _numTimesErrored:     0
-  _numTimesInterrupted: 0
-  _numTimesStarted:     0
-
-  # State-change handlers
-  _completeHandlers:  new Array()
-  _errorHandlers:     new Array()
-  _finalHandlers:     new Array()
-  _interruptHandlers: new Array()
-  _startHandlers:     new Array()
-
+  
   constructor: ( @_taskIdentifier ) ->
     @_id = ++Task.uid
+
+    @_data = null
+    @_message = null
+
+    # State variables
+    @_completed   = false
+    @_errored     = false
+    @_interrupted = false
+    @_running     = false
+
+    # State change counters
+    @_numTimesCompleted   = 0
+    @_numTimesErrored     = 0
+    @_numTimesInterrupted = 0
+    @_numTimesStarted     = 0
+
+    # State-change handlers
+    @_completeHandlers  = []
+    @_errorHandlers     = []
+    @_finalHandlers     = []
+    @_interruptHandlers = []
+    @_startHandlers     = []
 
   ###
   Override this method to give your Task functionality.
@@ -171,6 +170,22 @@ class Task extends EventDispatcher
   removeStartHandler: (closure) ->
     if @_startHandlers.indexOf( closure ) >= 0
       @_startHandlers.splice( @_startHandlers.indexOf( closure ), 1 )
+
+  ###
+  -----------------------------------------------------------------
+  Helper methods
+  -----------------------------------------------------------------
+  ###
+
+  ###
+  Returns a closure with the appropriate `this` scope.
+  This convenience method is useful for attaching state-change listeners.
+  ###
+  wrapper: (closure) ->
+    scope = this
+    return `function() {
+      closure.apply( scope, arguments );
+    }`
 
   ###
   -----------------------------------------------------------------

@@ -2,29 +2,37 @@
 <head>
 </head>
 <body>
+	<!--<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js" ></script>-->
 	<script type="text/javascript" src="task_manager.js"></script>
 	<script type="text/javascript">
-		var task =
-			new CompositeTask(
-				[
-					new TaskWithClosure(
-						function() {
-							console.log( "Custom task being run: " + this.id + ", " + this.taskIdentifier );
-						}, "First task" ),
-					new TaskWithClosure(
-						function() {
-							console.log( "Custom task being run: " + this.id + ", " + this.taskIdentifier );
-						}, "Second task" )
-					] ).
-				withCompleteHandler(
+		var task1 =
+			new TaskWithClosure(
+				function() {
+					console.log( "Custom task being run: " + this.id + ", " + this.taskIdentifier );
+				}, true, "First task" );
+		
+		var task2 =
+			new TaskWithClosure(
 					function() {
-						console.log( "CompositeTask complete: " + task.id );
+						console.log( "Custom task being run: " + this.id + ", " + this.taskIdentifier );
+					}, true, "Second task" ).
+				withCompleteHandler(
+					function( task ) {
+						console.log( "Second task complete (" + task.id + ")" );
+					} );
+	
+		var compositeTask =
+			new CompositeTask( [ task1, task2 ] ).
+				withCompleteHandler(
+					function( task ) {
+						//console.trace();
+						console.log( "CompositeTask complete: " + compositeTask.id + " (" + task.id + ")" );
 					} ).
 				withStartHandler(
-					function() {
-						console.log( "CompositeTask started: " + task.id );
+					function( task ) {
+						console.log( "CompositeTask started: " + compositeTask.id + " (" + task.id + ")" );
 					} );
-		task.run();
+		compositeTask.run();
 	</script>
 </body>
 </html>

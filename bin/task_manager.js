@@ -64,41 +64,24 @@ Task = (function(_super) {
 
   Task.uid = 0;
 
-  Task.prototype._id = 0;
-
-  Task.prototype._data = null;
-
-  Task.prototype._message = null;
-
-  Task.prototype._completed = false;
-
-  Task.prototype._errored = false;
-
-  Task.prototype._interrupted = false;
-
-  Task.prototype._running = false;
-
-  Task.prototype._numTimesCompleted = 0;
-
-  Task.prototype._numTimesErrored = 0;
-
-  Task.prototype._numTimesInterrupted = 0;
-
-  Task.prototype._numTimesStarted = 0;
-
-  Task.prototype._completeHandlers = new Array();
-
-  Task.prototype._errorHandlers = new Array();
-
-  Task.prototype._finalHandlers = new Array();
-
-  Task.prototype._interruptHandlers = new Array();
-
-  Task.prototype._startHandlers = new Array();
-
   function Task(_taskIdentifier) {
     this._taskIdentifier = _taskIdentifier;
     this._id = ++Task.uid;
+    this._data = null;
+    this._message = null;
+    this._completed = false;
+    this._errored = false;
+    this._interrupted = false;
+    this._running = false;
+    this._numTimesCompleted = 0;
+    this._numTimesErrored = 0;
+    this._numTimesInterrupted = 0;
+    this._numTimesStarted = 0;
+    this._completeHandlers = [];
+    this._errorHandlers = [];
+    this._finalHandlers = [];
+    this._interruptHandlers = [];
+    this._startHandlers = [];
   }
 
   /*
@@ -303,6 +286,28 @@ Task = (function(_super) {
 
   /*
   -----------------------------------------------------------------
+  Helper methods
+  -----------------------------------------------------------------
+  */
+
+
+  /*
+  Returns a closure with the appropriate `this` scope.
+  This convenience method is useful for attaching state-change listeners.
+  */
+
+
+  Task.prototype.wrapper = function(closure) {
+    var scope;
+
+    scope = this;
+    return function() {
+      closure.apply( scope, arguments );
+    };
+  };
+
+  /*
+  -----------------------------------------------------------------
   State change helper methods
   -----------------------------------------------------------------
   */
@@ -412,19 +417,15 @@ Event = (function() {
 CompositeTask = (function(_super) {
   __extends(CompositeTask, _super);
 
-  CompositeTask.prototype._addTasksBeforeRunInvoked = false;
-
-  CompositeTask.prototype._erroredTasks = [];
-
-  CompositeTask.prototype._flushTaskQueueLock = false;
-
-  CompositeTask.prototype._taskQueueIndex = 0;
-
   function CompositeTask(_taskQueue, _executeTaskInParallel, _taskIdentifier) {
     this._taskQueue = _taskQueue != null ? _taskQueue : [];
     this._executeTaskInParallel = _executeTaskInParallel != null ? _executeTaskInParallel : true;
     this._taskIdentifier = _taskIdentifier;
     CompositeTask.__super__.constructor.call(this, this._taskIdentifier);
+    this._addTasksBeforeRunInvoked = false;
+    this._erroredTasks = [];
+    this._flushTaskQueueLock = false;
+    this._taskQueueIndex = 0;
   }
 
   CompositeTask.prototype.customRun = function() {
@@ -435,6 +436,7 @@ CompositeTask = (function(_super) {
       this._addTasksBeforeRunInvoked = true;
     }
     if (this._taskQueue.length === 0 || this.allTasksAreCompleted) {
+      console.log("No task or all are completed");
       this.taskComplete();
       return;
     }
@@ -559,9 +561,9 @@ CompositeTask = (function(_super) {
 
 
   CompositeTask.prototype.addTaskEventListeners = function(task) {
-    task.withCompleteHandler(this._individualTaskCompleted);
-    task.withErrorHandler(this._individualTaskCompleteded);
-    return task.withStartHandler(this._individualTaskStarted);
+    task.withCompleteHandler(this.wrapper(this._individualTaskCompleted));
+    task.withErrorHandler(this.wrapper(this._individualTaskCompleteded));
+    return task.withStartHandler(this.wrapper(this._individualTaskStarted));
   };
 
   CompositeTask.prototype.checkForTaskCompletion = function() {
@@ -579,13 +581,22 @@ CompositeTask = (function(_super) {
   };
 
   CompositeTask.prototype.handleTaskCompletedOrRemoved = function(task) {
-    removeTaskEventListeners(task);
+    this.removeTaskEventListeners(task);
     if (task.isComplete) {
       individualTaskComplete(task);
     }
     this._taskQueueIndex++;
     if (!this.running) {
-
+      return;
+    }
+    if (this.handleTaskCompletedOrRemoved) {
+      return this.checkForTaskCompletion();
+    } else {
+      if (this.currentSerialTask) {
+        return this.currentSerialTask.run();
+      } else {
+        return this.checkForTaskCompletion();
+      }
     }
   };
 
@@ -601,7 +612,6 @@ CompositeTask = (function(_super) {
 
 
   CompositeTask.prototype._individualTaskCompleted = function(task) {
-    console.log("This: " + this + ", id: " + this.id + ", task: " + task + ", task.id: " + task.id);
     return this.handleTaskCompletedOrRemoved(task);
   };
 
