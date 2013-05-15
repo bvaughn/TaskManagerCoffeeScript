@@ -5,56 +5,52 @@
 	<!--<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js" ></script>-->
 	<script type="text/javascript" src="task_manager.js"></script>
 	<script type="text/javascript">
-		var task1 =
-			new TaskWithClosure(
-					function() {
-						console.log( "Custom task being run: " + this.id + ", " + this.taskIdentifier );
-					}, true, "First task (synchronous)" ).
-				withCompleteHandler(
-					function( task ) {
-						console.log( "First task complete (" + task.id + ")" );
-					} );
+		function taskCompleteHandler( task ) {
+			console.log( task.taskIdentifier + " complete" );
+		}
 		
-		var task2 =
-			new TaskWithClosure(
+		function taskStartHandler( task ) {
+			console.log( task.taskIdentifier + " started" );
+		}
+		
+		function runCompositeTask( executeTaskInParallel ) {
+			console.clear();
+			
+			var taskA =
+				new TaskWithClosure(
 					function() {
-						console.log( "Custom task being run: " + this.id + ", " + this.taskIdentifier );
-						
+					}, true, "Synchronous Task A" ).
+				withStartHandler( taskStartHandler ).
+				withCompleteHandler( taskCompleteHandler );
+		
+			var taskB =
+				new TaskWithClosure(
+					function() {
 						setTimeout(
 							function() {
-								console.log( "Task 2 timer complete" );
-								
-								task2.taskComplete();
+								console.log( "Task B timeout completed" );
+							
+								taskB.taskComplete();
 							}, 1000 );
-						
-					}, false, "Second task (asynchronous)" ).
-				withCompleteHandler(
-					function( task ) {
-						console.log( "Second task complete (" + task.id + ")" );
-					} );
+					}, false, "Asynchronous Task B" ).
+				withStartHandler( taskStartHandler ).
+				withCompleteHandler( taskCompleteHandler );
 
-		var task3 =
-			new TaskWithClosure(
+			var taskC =
+				new TaskWithClosure(
 					function() {
-						console.log( "Custom task being run: " + this.id + ", " + this.taskIdentifier );
-					}, true, "Third task (synchronous)" ).
-				withCompleteHandler(
-					function( task ) {
-						console.log( "Third task complete (" + task.id + ")" );
-					} );
-	
-		var compositeTask =
-			new CompositeTask( [ task1, task2, task3 ], false ).
-				withCompleteHandler(
-					function( task ) {
-						//console.trace();
-						console.log( "CompositeTask complete: " + compositeTask.id + " (" + task.id + ")" );
-					} ).
-				withStartHandler(
-					function( task ) {
-						console.log( "CompositeTask started: " + compositeTask.id + " (" + task.id + ")" );
-					} );
-		compositeTask.run();
+					}, true, "Synchronous Task C" ).
+				withStartHandler( taskStartHandler ).
+				withCompleteHandler( taskCompleteHandler );
+			
+			new CompositeTask( [ taskA, taskB, taskC ], executeTaskInParallel, "Composite task" ).
+				withStartHandler( taskStartHandler ).
+				withCompleteHandler( taskCompleteHandler ).
+				run();
+		}
 	</script>
+	
+	<button onclick="runCompositeTask( true )">Parallel</button>
+	<button onclick="runCompositeTask( false )">Serial</button>
 </body>
 </html>
