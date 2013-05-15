@@ -40,7 +40,17 @@ class Task extends EventDispatcher
   This method may also be used to retry/resume an errored task.
   ###
   run: ->
+    if @_running
+      return
+
     @_running = true
+    @_numTimesStarted++
+
+    @_interrupted = false
+    @_running     = true
+
+    for startHandler in @_startHandlers
+      @executeTaskStateChangeClosure( startHandler )
 
     @customRun()
 
@@ -111,65 +121,60 @@ class Task extends EventDispatcher
   Function can accept 0 arguments or 1 argument (the current Task)
   ###
   withCompleteHandler: (closure) ->
-    if @_completeHandlers.indexOf( closure ) < 0
-      @_completeHandlers.push( closure )
+    @addFunctionOrClosure( @_completeHandlers, closure )
     return this
 
   removeCompleteHandler: (closure) ->
-    if @_completeHandlers.indexOf( closure ) >= 0
-      @_completeHandlers.splice( @_completeHandlers.indexOf( closure ), 1 )
+    @removeFunctionOrClosure( @_completeHandlers, closure )
+    return this
 
   ###
   The provided function will be invoked only upon failure of the task.
   Function can accept 0 arguments or 1 argument (the current Task)
   ###
   withErrorHandler: (closure) ->
-    if @_errorHandlers.indexOf( closure ) < 0
-      @_errorHandlers.push( closure )
+    @addFunctionOrClosure( @_errorHandlers, closure )
     return this
 
   removeErrorHandler: (closure) ->
-    if @_errorHandlers.indexOf( closure ) >= 0
-      @_errorHandlers.splice( @_errorHandlers.indexOf( closure ), 1 )
+    @removeFunctionOrClosure( @_errorHandlers, closure )
+    return this
 
   ###
   This handler is invoked upon either success or failure of the Task.
   Function can accept 0 arguments or 1 argument (the current Task)
   ###
   withFinalHandler: (closure) ->
-    if @_finalHandlers.indexOf( closure ) < 0
-      @_finalHandlers.push( closure )
+    @addFunctionOrClosure( @_finalHandlers, closure )
     return this
 
   removeFinalHandler: (closure) ->
-    if @_finalHandlers.indexOf( closure ) >= 0
-      @_finalHandlers.splice( @_finalHandlers.indexOf( closure ), 1 )
+    @removeFunctionOrClosure( @_finalHandlers, closure )
+    return this
 
   ###
   The provided function will be invoked only upon interruption of the Task.
   Function can accept 0 arguments or 1 argument (the current Task)
   ###
   withInterruptHandler: (closure) ->
-    if @_interruptHandlers.indexOf( closure ) < 0
-      @_interruptHandlers.push( closure )
+    @addFunctionOrClosure( @_interruptHandlers, closure )
     return this
 
   removeInterruptHandler: (closure) ->
-    if @_interruptHandlers.indexOf( closure ) >= 0
-      @_interruptHandlers.splice( @_interruptHandlers.indexOf( closure ), 1 )
+    @removeFunctionOrClosure( @_interruptHandlers, closure )
+    return this
 
   ###
   The provided function will be invoked each time the task is started (or re-started).
   Function can accept 0 arguments or 1 argument (the current Task)
   ###
   withStartHandler: (closure) ->
-    if @_startHandlers.indexOf( closure ) < 0
-      @_startHandlers.push( closure )
+    @addFunctionOrClosure( @_startHandlers, closure )
     return this
 
   removeStartHandler: (closure) ->
-    if @_startHandlers.indexOf( closure ) >= 0
-      @_startHandlers.splice( @_startHandlers.indexOf( closure ), 1 )
+    @removeFunctionOrClosure( @_startHandlers, closure )
+    return this
 
   ###
   -----------------------------------------------------------------
@@ -178,14 +183,46 @@ class Task extends EventDispatcher
   ###
 
   ###
+  Adds the specified function (or Closure) to the specified Array
+  ###
+  addFunctionOrClosure: (functionAndClosures, functionOrClosureToAdd) ->
+    if functionOrClosureToAdd instanceof Closure
+      for functionOrClosure, index in functionAndClosures
+        if functionOrClosure instanceof Closure && functionOrClosure.equals( functionOrClosureToAdd )
+          return
+    else
+      if functionAndClosures.indexOf( functionOrClosureToAdd ) >= 0
+        return
+    functionAndClosures.push( functionOrClosureToAdd )
+
+  ###
+  Executes a function or a Closure (with inner function)
+  ###
+  executeTaskStateChangeClosure: (closure) ->
+    if closure instanceof Closure
+      closure.execute( this )
+    else
+      closure( this )
+
+  ###
   Returns a closure with the appropriate `this` scope.
   This convenience method is useful for attaching state-change listeners.
   ###
   wrapper: (closure) ->
-    scope = this
-    return `function() {
-      closure.apply( scope, arguments );
-    }`
+    return new Closure( closure, this )
+
+  ###
+  Removes the specified function (or Closure) from the specified Array
+  ###
+  removeFunctionOrClosure: (functionAndClosures, functionOrClosureToRemove) ->
+    if functionOrClosureToRemove instanceof Closure
+      for functionOrClosure, index in functionAndClosures
+        if functionOrClosure instanceof Closure && functionOrClosure.equals( functionOrClosureToRemove )
+          functionAndClosures.splice( index, 1 )
+          break
+    else
+      if functionAndClosures.indexOf( functionOrClosureToRemove ) >= 0
+        functionAndClosures.splice( functionAndClosures.indexOf( functionOrClosureToRemove ), 1 )
 
   ###
   -----------------------------------------------------------------
@@ -211,10 +248,10 @@ class Task extends EventDispatcher
     @_numTimesCompleted++;
     
     for completeHandler in @_completeHandlers
-      completeHandler( this )
+      @executeTaskStateChangeClosure( completeHandler )
 
     for finalHandler in @_finalHandlers
-      finalHandler( this )
+      @executeTaskStateChangeClosure( finalHandler )
 
   # This method should be called upon Task failure.
   # Typically this method should only be called by a Task, internally.
@@ -234,7 +271,7 @@ class Task extends EventDispatcher
     @_numTimesErrored++;
 
     for errorHandler in @_errorHandlers
-      errorHandler( this )
+      @executeTaskStateChangeClosure( errorHandler )
 
     for finalHandler in @_finalHandlers
-      finalHandler( this )
+      @executeTaskStateChangeClosure( finalHandler )

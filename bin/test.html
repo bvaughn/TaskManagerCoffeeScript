@@ -7,22 +7,44 @@
 	<script type="text/javascript">
 		var task1 =
 			new TaskWithClosure(
-				function() {
-					console.log( "Custom task being run: " + this.id + ", " + this.taskIdentifier );
-				}, true, "First task" );
+					function() {
+						console.log( "Custom task being run: " + this.id + ", " + this.taskIdentifier );
+					}, true, "First task (synchronous)" ).
+				withCompleteHandler(
+					function( task ) {
+						console.log( "First task complete (" + task.id + ")" );
+					} );
 		
 		var task2 =
 			new TaskWithClosure(
 					function() {
 						console.log( "Custom task being run: " + this.id + ", " + this.taskIdentifier );
-					}, true, "Second task" ).
+						
+						setTimeout(
+							function() {
+								console.log( "Task 2 timer complete" );
+								
+								task2.taskComplete();
+							}, 1000 );
+						
+					}, false, "Second task (asynchronous)" ).
 				withCompleteHandler(
 					function( task ) {
 						console.log( "Second task complete (" + task.id + ")" );
 					} );
+
+		var task3 =
+			new TaskWithClosure(
+					function() {
+						console.log( "Custom task being run: " + this.id + ", " + this.taskIdentifier );
+					}, true, "Third task (synchronous)" ).
+				withCompleteHandler(
+					function( task ) {
+						console.log( "Third task complete (" + task.id + ")" );
+					} );
 	
 		var compositeTask =
-			new CompositeTask( [ task1, task2 ] ).
+			new CompositeTask( [ task1, task2, task3 ], false ).
 				withCompleteHandler(
 					function( task ) {
 						//console.trace();

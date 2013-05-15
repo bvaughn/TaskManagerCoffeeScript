@@ -14,7 +14,6 @@ class CompositeTask extends Task
       @_addTasksBeforeRunInvoked = true
 
     if @_taskQueue.length == 0 || @allTasksAreCompleted
-      console.log "No task or all are completed"
       @taskComplete()
       return
     
@@ -27,7 +26,7 @@ class CompositeTask extends Task
       for task in @_taskQueue
         task.run()
     else
-      currentSerialTask.run()
+      @currentSerialTask.run()
 
   ###
   -----------------------------------------------------------------
@@ -112,8 +111,8 @@ class CompositeTask extends Task
     @removeTaskEventListeners( task )
 
     # If this Task was removed before completion, don't call the Task-complete hook.
-    if task.isComplete
-      individualTaskComplete( task )
+    if task.completed
+      @individualTaskComplete( task )
 
     @_taskQueueIndex++
 
@@ -121,7 +120,7 @@ class CompositeTask extends Task
     if !@running
       return
 
-    if @handleTaskCompletedOrRemoved
+    if @_executeTaskInParallel
       @checkForTaskCompletion()
     else
       if @currentSerialTask
@@ -129,11 +128,10 @@ class CompositeTask extends Task
       else
         @checkForTaskCompletion()
 
-  # TODO: This doesn't actually work currently because of the @wrapper logic
   removeTaskEventListeners: (task) ->
-    task.removeCompleteHandler( @_individualTaskCompleted )
-    task.removeErrorHandler( @_individualTaskCompleteded )
-    task.removeStartHandler( @_individualTaskStarted )
+    task.removeCompleteHandler( @wrapper( @_individualTaskCompleted ) )
+    task.removeErrorHandler( @wrapper( @_individualTaskCompleteded ) )
+    task.removeStartHandler( @wrapper( @_individualTaskStarted ) )
 
   ###
   Individual Task event handlers
@@ -155,8 +153,8 @@ class CompositeTask extends Task
   # Override this method to J.I.T. add child Tasks before the composite Task is run.
   addTasksBeforeRun: ->
 
-  # Override this method to J.I.T. add child Tasks before the composite Task is run.
-  addTasksBeforeRun: ->
+  # Override this method to be notified when individual Tasks have successfully completed.
+  individualTaskComplete: ->
 
-  # Override this method to J.I.T. add child Tasks before the composite Task is run.
-  addTasksBeforeRun: ->
+  # Override this method to be notified when individual Tasks are started.
+  individualTaskStarted: ->
