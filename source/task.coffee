@@ -5,11 +5,15 @@ Function::property = (prop, desc) ->
 class Task extends EventDispatcher
   @uid: 0
   
+  ###
+  Constructor
+  ###
   constructor: ( @_taskIdentifier ) ->
     @_id = ++Task.uid
 
     @_data = null
     @_message = null
+    @_interruptingTask = null
 
     # State variables
     @_completed   = false
@@ -21,6 +25,7 @@ class Task extends EventDispatcher
     @_numTimesCompleted   = 0
     @_numTimesErrored     = 0
     @_numTimesInterrupted = 0
+    @_numTimesReset       = 0
     @_numTimesStarted     = 0
 
     # State-change handlers
@@ -31,9 +36,32 @@ class Task extends EventDispatcher
     @_startHandlers     = []
 
   ###
-  Override this method to give your Task functionality.
+  Resets the task to it's pre-run state.
+  This allows it to be re-run.
+  This method can only be called on non-running tasks.
+  @return [Task] A reference to the current Task
   ###
-  customRun: ->
+  reset: ->
+    if @running
+      return
+
+    if @numTimesStarted == 0
+      return
+
+    @_numTimesReset++
+
+    @_completed   = false
+    @_errored     = false
+    @_interrupted = false
+
+    @_numTimesCompleted   = 0
+    @_numTimesErrored     = 0
+    @_numTimesInterrupted = 0
+    @_numTimesStarted     = 0
+
+    @customReset()
+
+    return this
 
   ###
   Starts a task.
@@ -58,41 +86,73 @@ class Task extends EventDispatcher
 
   ###
   -----------------------------------------------------------------
-  Getter / setter methods
+  Subclasses should override the following methods
   -----------------------------------------------------------------
   ###
 
-  @property 'id',
-    get: ->
-      return @_id
+  ###
+  Override this method to give your Task functionality.
+  ###
+  customRun: ->
+    throw "Tasks must implement customRun() method";
 
-  @property 'data',
-    get: ->
-      return @_data
+  ###
+  Sub-classes should override this method to implement interruption behavior (removing event listeners, pausing objects, etc.).
+  ###
+  customInterrupt: ->
+    throw "Tasks must implement customInterrupt() method";
 
-  @property 'message',
-    get: ->
-      return @_message
+  ###
+  Override this method to perform any custom reset operations.
+  ###
+  customReset: ->
+    throw "Tasks must implement customReset() method";
 
-  @property 'taskIdentifier',
-    get: ->
-      return @_taskIdentifier
+  ###
+  -----------------------------------------------------------------
+  Getter / setter methods
+  -----------------------------------------------------------------
+  ###
 
   @property 'completed',
     get: ->
       return @_completed
 
+  @property 'data',
+    get: ->
+      return @_data
+
   @property 'errored',
     get: ->
       return @_errored
+
+  @property 'id',
+    get: ->
+      return @_id
 
   @property 'interrupted',
     get: ->
       return @_interrupted
 
-  @property 'running',
+  @property 'interruptingTask',
     get: ->
-      return @_running
+      return @_interruptingTask
+
+  @property 'message',
+    get: ->
+      return @_message
+
+  @property 'numInternalOperations',
+    get: ->
+      return 1
+
+  @property 'numInternalOperationsCompleted',
+    get: ->
+      return @completed ? 1 : 0
+
+  @property 'numInternalOperationsPending',
+    get: ->
+      return @numInternalOperations - @numInternalOperationsCompleted
 
   @property 'numTimesCompleted',
     get: ->
@@ -105,10 +165,24 @@ class Task extends EventDispatcher
   @property 'numTimesInterrupted',
     get: ->
       return @_numTimesInterrupted
-			
+
+  @property 'numTimesReset',
+    get: ->
+      return @_numTimesReset
+
   @property 'numTimesStarted',
     get: ->
       return @_numTimesStarted
+
+  @property 'running',
+    get: ->
+      return @_running
+
+  @property 'taskIdentifier',
+    get: ->
+      return @_taskIdentifier
+    set: (value) ->
+      @_taskIdentifier = value
 
   ###
   -----------------------------------------------------------------

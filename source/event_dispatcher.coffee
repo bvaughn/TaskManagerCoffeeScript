@@ -1,12 +1,13 @@
-# http://adrianwiecek.com/2012/02/24/coffeescript-eventdispatcher/
-#Base class for objects supporting event dispatching.
+###
+# Base class for objects supporting event dispatching. #
+Big thanks to [adrianwiecek](http://adrianwiecek.com/2012/02/24/coffeescript-eventdispatcher/)
+###
 class EventDispatcher
   callbacks: {}
  
   #Registers callback for specified eventType.
-  #@param eventType of type String
-  #@param callback of type Function,
-  #should have one argument of type Event
+  #@param [String] event type/name
+  #@param [Function] callback accepting 1 parameter of type event
   addListener: (eventType, callback) ->
     if not @callbacks[eventType]
       @callbacks[eventType] = []
@@ -14,9 +15,11 @@ class EventDispatcher
     if @callbacks[eventType].indexOf(callback) < 0
       @callbacks[eventType].push(callback)
   
-  #Removes registered callback for specified eventType.
-  #@param eventType of type String
-  #@param callback of type Function
+  ###
+  Removes registered callback for specified eventType.
+  @param [String] event type/name
+  @param [Function] callback
+  ###
   removeListener: (eventType, callback) ->
     return unless this.hasListeners(eventType)
     index = @callbacks[eventType].indexOf(callback)
