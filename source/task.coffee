@@ -1,12 +1,22 @@
-# Assists in the creation of getter/setter properties
-Function::property = (prop, desc) ->
-  Object.defineProperty @prototype, prop, desc
+###
+A Task is any operation that can be started and completed.
+A Task may be a self-contained operation or it may be a composite of many such other Tasks.
 
+To create a usable Task, extend this class and override the **customRun()**, **customReset()**, and **customInterrupt()** methods.
+Your Task should call taskComplete() or taskError() upon completion.
+
+@author [Brian Vaughn](http://www.briandavidvaughn.com)
+###
 class Task extends EventDispatcher
+
+  get = (props) => @::__defineGetter__ name, getter for name, getter of props
+  set = (props) => @::__defineSetter__ name, setter for name, setter of props
+
   @uid: 0
   
   ###
   Constructor
+  @param taskIdentifier [String] Optional human-readable label for Task-instance; can be useful for debugging or logging purposes
   ###
   constructor: ( @_taskIdentifier ) ->
     @_id = ++Task.uid
@@ -14,6 +24,7 @@ class Task extends EventDispatcher
     @_data = null
     @_message = null
     @_interruptingTask = null
+    @_synchronous = false
 
     # State variables
     @_completed   = false
@@ -65,7 +76,8 @@ class Task extends EventDispatcher
 
   ###
   Starts a task.
-  This method may also be used to retry/resume an errored task.
+  This method may be used to retry an errored Task or to resume an interrupted Task.
+  @return [Task] A reference to the current Task
   ###
   run: ->
     if @_running
@@ -92,18 +104,21 @@ class Task extends EventDispatcher
 
   ###
   Override this method to give your Task functionality.
+  @throw Error if not implemented
   ###
   customRun: ->
     throw "Tasks must implement customRun() method";
 
   ###
   Sub-classes should override this method to implement interruption behavior (removing event listeners, pausing objects, etc.).
+  @throw Error if not implemented
   ###
   customInterrupt: ->
     throw "Tasks must implement customInterrupt() method";
 
   ###
   Override this method to perform any custom reset operations.
+  @throw [Error] Error if not implemented
   ###
   customReset: ->
     throw "Tasks must implement customReset() method";
@@ -114,75 +129,68 @@ class Task extends EventDispatcher
   -----------------------------------------------------------------
   ###
 
-  @property 'completed',
-    get: ->
-      return @_completed
+  # @property [Boolean] The current task has successfully completed execution.
+  get completed: -> @_completed
 
-  @property 'data',
-    get: ->
-      return @_data
+  # @property [Object] Optional data resulting from Task completion or failure.
+  get data: -> @_data
 
-  @property 'errored',
-    get: ->
-      return @_errored
+  # @property [Boolean] The current Task failed.
+  get errored: -> @_errored
 
-  @property 'id',
-    get: ->
-      return @_id
+  # @property [Integer] Unique ID for a Task.
+  get id: -> @_id
 
-  @property 'interrupted',
-    get: ->
-      return @_interrupted
+  # @property [Boolean] The task has been interrupted and has not yet resumed.
+  get interrupted: -> @_interrupted
 
-  @property 'interruptingTask',
-    get: ->
-      return @_interruptingTask
+  # @property [Task] The Task currently interrupting the this Task's execution (or NULL if no such Task exists).
+  get interruptingTask: -> @_interruptingTask
 
-  @property 'message',
-    get: ->
-      return @_message
+  # @property [String] Optional message resulting from Task completion or failure.
+  get message: -> @_message
 
-  @property 'numInternalOperations',
-    get: ->
-      return 1
+  # @property [Integer] 
+  # Number of internal operations conducted by this task.
+  # Sub-classes should override this method if containing a value > 1;
+  get numInternalOperations: -> 1
 
-  @property 'numInternalOperationsCompleted',
-    get: ->
-      return @completed ? 1 : 0
+  # @property [Integer]
+  # Number of internal operations that have completed.
+  # Sub-classes should override this method if containing a value > 1;
+  get numInternalOperationsCompleted: -> @completed ? 1 : 0
 
-  @property 'numInternalOperationsPending',
-    get: ->
-      return @numInternalOperations - @numInternalOperationsCompleted
+  # @property [Integer] Number of internal operations not yet completed.
+  get numInternalOperationsPending: -> @numInternalOperations - @numInternalOperationsCompleted
 
-  @property 'numTimesCompleted',
-    get: ->
-      return @_numTimesCompleted
-	
-  @property 'numTimesErrored',
-    get: ->
-      return @_numTimesErrored
-		
-  @property 'numTimesInterrupted',
-    get: ->
-      return @_numTimesInterrupted
+  # @property [Integer] Number of times this task has completed.
+  get numTimesCompleted: -> @_numTimesCompleted
 
-  @property 'numTimesReset',
-    get: ->
-      return @_numTimesReset
+  # @property [Integer] Number of times this task has errored.
+  get numTimesErrored: -> @_numTimesErrored
 
-  @property 'numTimesStarted',
-    get: ->
-      return @_numTimesStarted
+  # @property [Integer] Number of times this task has been interrupted.
+  get numTimesInterrupted: -> @_numTimesInterrupted
 
-  @property 'running',
-    get: ->
-      return @_running
+  # @property [Integer]
+  # Number of times this task has been reset.
+  # This is the only counter that is not reset by the reset() method.
+  get numTimesReset: -> @_numTimesReset
 
-  @property 'taskIdentifier',
-    get: ->
-      return @_taskIdentifier
-    set: (value) ->
-      @_taskIdentifier = value
+  # @property [Integer] Number of times this task has been started.
+  get numTimesStarted: -> @_numTimesStarted
+
+  # @property [Boolean]
+  # The task is currently running.
+  # This value is FALSE if the task has not been run, has completed run (succesfully or due to a failure), or has been interrupted.
+  get running: -> @_running
+
+  # @property [Boolean] The current task can be executed synchronously.
+  get synchronous: -> @_synchronous
+
+  # @property [String] (Optional) human-readable label for task.
+  get taskIdentifier: -> @_taskIdentifier
+  set taskIdentifier: (@_taskIdentifier) ->
 
   ###
   -----------------------------------------------------------------
@@ -193,61 +201,66 @@ class Task extends EventDispatcher
   ###
   The provided function will be invoked only upon successful completion of the task.
   Function can accept 0 arguments or 1 argument (the current Task)
+  @param closure [Closure] Function with "this" scope
   ###
   withCompleteHandler: (closure) ->
-    @addFunctionOrClosure( @_completeHandlers, closure )
+    @addClosureToSet( @_completeHandlers, closure )
     return this
 
   removeCompleteHandler: (closure) ->
-    @removeFunctionOrClosure( @_completeHandlers, closure )
+    @removeClosureFromSet( @_completeHandlers, closure )
     return this
 
   ###
   The provided function will be invoked only upon failure of the task.
   Function can accept 0 arguments or 1 argument (the current Task)
+  @param closure [Closure] Function with "this" scope
   ###
   withErrorHandler: (closure) ->
-    @addFunctionOrClosure( @_errorHandlers, closure )
+    @addClosureToSet( @_errorHandlers, closure )
     return this
 
   removeErrorHandler: (closure) ->
-    @removeFunctionOrClosure( @_errorHandlers, closure )
+    @removeClosureFromSet( @_errorHandlers, closure )
     return this
 
   ###
   This handler is invoked upon either success or failure of the Task.
   Function can accept 0 arguments or 1 argument (the current Task)
+  @param closure [Closure] Function with "this" scope
   ###
   withFinalHandler: (closure) ->
-    @addFunctionOrClosure( @_finalHandlers, closure )
+    @addClosureToSet( @_finalHandlers, closure )
     return this
 
   removeFinalHandler: (closure) ->
-    @removeFunctionOrClosure( @_finalHandlers, closure )
+    @removeClosureFromSet( @_finalHandlers, closure )
     return this
 
   ###
   The provided function will be invoked only upon interruption of the Task.
   Function can accept 0 arguments or 1 argument (the current Task)
+  @param closure [Closure] Function with "this" scope
   ###
   withInterruptHandler: (closure) ->
-    @addFunctionOrClosure( @_interruptHandlers, closure )
+    @addClosureToSet( @_interruptHandlers, closure )
     return this
 
   removeInterruptHandler: (closure) ->
-    @removeFunctionOrClosure( @_interruptHandlers, closure )
+    @removeClosureFromSet( @_interruptHandlers, closure )
     return this
 
   ###
   The provided function will be invoked each time the task is started (or re-started).
   Function can accept 0 arguments or 1 argument (the current Task)
+  @param closure [Closure] Function with "this" scope
   ###
   withStartHandler: (closure) ->
-    @addFunctionOrClosure( @_startHandlers, closure )
+    @addClosureToSet( @_startHandlers, closure )
     return this
 
   removeStartHandler: (closure) ->
-    @removeFunctionOrClosure( @_startHandlers, closure )
+    @removeClosureFromSet( @_startHandlers, closure )
     return this
 
   ###
@@ -258,45 +271,37 @@ class Task extends EventDispatcher
 
   ###
   Adds the specified function (or Closure) to the specified Array
+  @private
   ###
-  addFunctionOrClosure: (functionAndClosures, functionOrClosureToAdd) ->
-    if functionOrClosureToAdd instanceof Closure
-      for functionOrClosure, index in functionAndClosures
-        if functionOrClosure instanceof Closure && functionOrClosure.equals( functionOrClosureToAdd )
-          return
-    else
-      if functionAndClosures.indexOf( functionOrClosureToAdd ) >= 0
+  addClosureToSet: (closures, closureToAdd) ->
+    unless closureToAdd instanceof Closure
+      closureToAdd = new Closure( closureToAdd, this )
+
+    for closure in closures
+      if closure.equals( closureToAdd )
         return
-    functionAndClosures.push( functionOrClosureToAdd )
+
+    closures.push( closureToAdd )
 
   ###
   Executes a function or a Closure (with inner function)
+  @private
   ###
   executeTaskStateChangeClosure: (closure) ->
-    if closure instanceof Closure
-      closure.execute( this )
-    else
-      closure( this )
-
-  ###
-  Returns a closure with the appropriate `this` scope.
-  This convenience method is useful for attaching state-change listeners.
-  ###
-  wrapper: (closure) ->
-    return new Closure( closure, this )
+    closure.execute( this )
 
   ###
   Removes the specified function (or Closure) from the specified Array
+  @private
   ###
-  removeFunctionOrClosure: (functionAndClosures, functionOrClosureToRemove) ->
-    if functionOrClosureToRemove instanceof Closure
-      for functionOrClosure, index in functionAndClosures
-        if functionOrClosure instanceof Closure && functionOrClosure.equals( functionOrClosureToRemove )
-          functionAndClosures.splice( index, 1 )
-          break
-    else
-      if functionAndClosures.indexOf( functionOrClosureToRemove ) >= 0
-        functionAndClosures.splice( functionAndClosures.indexOf( functionOrClosureToRemove ), 1 )
+  removeClosureFromSet: (closures, closureToRemove) ->
+    unless closureToRemove instanceof Closure
+      closureToRemove = new Closure( closureToRemove, this )
+
+    for closure, index in closures
+      if closure.equals( closureToRemove )
+        closures.splice( index, 1 )
+        break
 
   ###
   -----------------------------------------------------------------

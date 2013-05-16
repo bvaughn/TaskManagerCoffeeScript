@@ -1,5 +1,19 @@
+###
+Wraps a set of ITasks and executes them in parallel or serial, as specified by a boolean constructor arg.
+
+@author [Brian Vaughn](http://www.briandavidvaughn.com)
+###
 class CompositeTask extends Task
 
+  get = (props) => @::__defineGetter__ name, getter for name, getter of props
+  set = (props) => @::__defineSetter__ name, setter for name, setter of props
+
+  ###
+  Constructor.
+  @param taskQueue [Array<Task>] Set of Tasks and/or functions to be executed.
+  @param executeTaskInParallel [Boolean] Execute all Tasks at the same time; if this value is FALSE Tasks will be executed in serial.
+  @param taskIdentifier [String] Optional human-readable label for Task-instance; can be useful for debugging or logging purposes.
+  ###
   constructor: ( @_taskQueue = [], @_executeTaskInParallel = true, @_taskIdentifier ) ->
     super( @_taskIdentifier )
 
@@ -8,6 +22,7 @@ class CompositeTask extends Task
     @_flushTaskQueueLock = false
     @_taskQueueIndex = 0
 
+  # @private
   customRun: ->
     if !@_addTasksBeforeRunInvoked
       @addTasksBeforeRun()
@@ -34,55 +49,42 @@ class CompositeTask extends Task
   -----------------------------------------------------------------
   ###
 
-  ###
-  No incomplete Tasks remain in the queue.
-  ###
-  @property 'allTasksAreCompleted',
-    get: ->
-      for task in @_taskQueue
-        if !task.completed
-          return false
-      return true
+  # @property [Boolean] No incomplete Tasks remain in the queue.
+  get allTasksAreCompleted: ->
+    for task in @_taskQueue
+      if !task.completed
+        return false
+    return true
 
-  ###
-  References the Task that is currently running (if this CompositeTask has been told to execute in serial).
-  ###
-  @property 'currentSerialTask',
-    get: ->
-      if @_taskQueue.length > @_taskQueueIndex
-        return @_taskQueue[ @_taskQueueIndex ]
-      else
-        return null
+  # @property [Task] References the Task that is currently running (if this CompositeTask has been told to execute in serial).
+  get currentSerialTask: ->
+    if @_taskQueue.length > @_taskQueueIndex
+      return @_taskQueue[ @_taskQueueIndex ]
+    else
+      return null
 
-  ###
-  Unique error messages from all inner Tasks that failed during execution.
-  This value is valid after during execution of the CompositeTask as well as upon completion (or failure).
-  ###
-  @property 'errorMessages',
-    get: ->
-      returnArray = []
-      for task in @_erroredTasks
-        returnArray.push( task.message )
-      return returnArray
+  # @property [Array<String>]
+  # Unique error messages from all inner Tasks that failed during execution.
+  # This value is valid after during execution of the CompositeTask as well as upon completion (or failure).
+  get errorMessages: ->
+    returnArray = []
+    for task in @_erroredTasks
+      returnArray.push( task.message )
+    return returnArray
 
-  ###
-  Error datas from all inner Tasks that failed during execution.
-  This value is valid after during execution of the CompositeTask as well as upon completion (or failure).
-  ###
-  @property 'errorDatas',
-    get: ->
-      returnArray = []
-      for task in @_erroredTasks
-        returnArray.push( task.data )
-      return returnArray
+  # @property [Array<Object>]
+  # Error datas from all inner Tasks that failed during execution.
+  # This value is valid after during execution of the CompositeTask as well as upon completion (or failure).
+  get errorDatas: ->
+    returnArray = []
+    for task in @_erroredTasks
+      returnArray.push( task.data )
+    return returnArray
 
-  ###
-  Tasks that errored during execution.
-  This value is valid after during execution of the CompositeTask as well as upon completion (or failure).
-  ###
-  @property 'erroredTasks',
-    get: ->
-      return @_erroredTasks
+  # @property [Array<Task>]
+  # Tasks that errored during execution.
+  # This value is valid after during execution of the CompositeTask as well as upon completion (or failure).
+  get erroredTasks: -> @_erroredTasks
 
   ###
   -----------------------------------------------------------------
@@ -90,11 +92,13 @@ class CompositeTask extends Task
   -----------------------------------------------------------------
   ###
 
+  # @private
   addTaskEventListeners: (task) ->
-    task.withCompleteHandler( @wrapper( @_individualTaskCompleted ) )
-    task.withErrorHandler( @wrapper( @_individualTaskCompleteded ) )
-    task.withStartHandler( @wrapper( @_individualTaskStarted ) )
+    task.withCompleteHandler( new Closure( @_individualTaskCompleted, this ) )
+    task.withErrorHandler( new Closure( @_individualTaskCompleteded, this ) )
+    task.withStartHandler( new Closure( @_individualTaskStarted, this ) )
 
+  # @private
   checkForTaskCompletion: ->
     if @_flushTaskQueueLock
       return
@@ -107,6 +111,7 @@ class CompositeTask extends Task
     else
       @taskComplete()
 
+  # @private
   handleTaskCompletedOrRemoved: (task) ->
     @removeTaskEventListeners( task )
 
@@ -128,21 +133,25 @@ class CompositeTask extends Task
       else
         @checkForTaskCompletion()
 
+  # @private
   removeTaskEventListeners: (task) ->
-    task.removeCompleteHandler( @wrapper( @_individualTaskCompleted ) )
-    task.removeErrorHandler( @wrapper( @_individualTaskCompleteded ) )
-    task.removeStartHandler( @wrapper( @_individualTaskStarted ) )
+    task.removeCompleteHandler( new Closure( @_individualTaskCompleted, this ) )
+    task.removeErrorHandler( new Closure( @_individualTaskCompleteded, this ) )
+    task.removeStartHandler( new Closure( @_individualTaskStarted, this ) )
 
   ###
   Individual Task event handlers
   ###
 
+  # @private
   _individualTaskCompleted: (task) ->
     @handleTaskCompletedOrRemoved( task )
 
+  # @private
   _individualTaskErrored: (task) ->
     # TODO
 
+  # @private
   _individualTaskStarted: (task) ->
     # TODO
 

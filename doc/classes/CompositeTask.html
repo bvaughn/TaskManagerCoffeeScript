@@ -1,0 +1,380 @@
+<!DOCTYPE html>
+<html>
+  <head>
+  <meta charset='UTF-8'>
+  <title>CoffeeScript API Documentation</title>
+  <link rel='stylesheet' href='../assets/codo.css' type='text/css'>
+  <script src='../assets/codo.js'></script>
+  <script src='../assets/search_data.js'></script>
+</head>
+  <body>
+    <div id='base' data-path='../'></div>
+<div id='header'>
+  <div id='menu'>
+    <a href='../README.md.html' title='TaskManagerCoffeeScript'>TaskManagerCoffeeScript</a>
+    &raquo;
+    <a href='../class_index.html' title='Index'>Index</a>
+    &raquo;
+    <span class='title'>CompositeTask</span>
+    <nav>
+      <ul>
+        <li class='noframes'>
+          (<a class='noframes' href='#'>no frames</a>)
+        </li>
+      </ul>
+    </nav>
+    <div id='search'>
+      <a id='class_list_link' href='../class_list.html'>Classes</a>
+      <a id='method_list_link' href='../method_list.html'>Methods</a>
+      <a id='extra_list_link' href='../extra_list.html'>Extras</a>
+    </div>
+  </div>
+  <iframe id='search_frame'></iframe>
+  <div id='fuzzySearch'>
+    <input type='text'>
+    <ol></ol>
+  </div>
+  <div id='help'>
+    <p>
+      Quickly fuzzy find classes, mixins, methods, file:
+    </p>
+    <ul>
+      <li>
+        <span>Ctrl-T</span>
+        Open fuzzy finder dialog
+      </li>
+    </ul>
+    <p>
+      In frame mode you can toggle the list naviation frame on the left side:
+    </p>
+    <ul>
+      <li>
+        <span>Ctrl-L</span>
+        Toggle list view
+      </li>
+    </ul>
+    <p>
+      You can focus a list in frame mode or toggle a tab in frameless mode:
+    </p>
+    <ul>
+      <li>
+        <span>Ctrl-C</span>
+        Class list
+      </li>
+      <li>
+        <span>Ctrl-I</span>
+        Mixin list
+      </li>
+      <li>
+        <span>Ctrl-F</span>
+        File list
+      </li>
+      <li>
+        <span>Ctrl-M</span>
+        Method list
+      </li>
+      <li>
+        <span>Ctrl-E</span>
+        Extras list
+      </li>
+    </ul>
+    <p>
+      You can focus and blur the search input:
+    </p>
+    <ul>
+      <li>
+        <span>Ctrl-S</span>
+        Focus search input
+      </li>
+      <li>
+        <span>Esc</span>
+        Blur search input
+      </li>
+    </ul>
+    <p>
+      In frameless mode you can close the list tab:
+    </p>
+    <ul>
+      <li>
+        <span>Esc</span>
+        Close list tab
+      </li>
+    </ul>
+  </div>
+</div>
+    <div id='content'>
+      <h1>
+        Class:
+        CompositeTask
+      </h1>
+      <table class='box'>
+        <tr>
+          <td>Defined in:</td>
+          <td>.&#47;source&#47;composite_task.coffee</td>
+        </tr>
+        <tr>
+          <td>Inherits:</td>
+          <td>
+            <a href='../classes/Task.html'>Task</a>
+          </td>
+        </tr>
+      </table>
+      <h2>Overview</h2>
+      <div class='docstring'>
+  <p>Wraps a set of ITasks and executes them in parallel or serial, as specified by a boolean constructor arg.</p>
+</div>
+<div class='tags'>
+  <h3>Author:</h3>
+  <ul class='author'>
+    <li>
+      <a href="http://www.briandavidvaughn.com">Brian Vaughn</a>
+    </li>
+  </ul>
+</div>
+      <h2>Property Summary</h2>
+      <dl class='properties'>
+        <dt id='allTasksAreCompleted-property'>
+          <span class='signature'>
+            (Boolean) <strong>allTasksAreCompleted</strong>
+          </span>
+          <span class='note readonly title'>Readonly</span>
+        </dt>
+        <dd class='desc'>
+          <p>No incomplete Tasks remain in the queue.</p>
+        </dd>
+        <dt id='currentSerialTask-property'>
+          <span class='signature'>
+            (Task) <strong>currentSerialTask</strong>
+          </span>
+          <span class='note readonly title'>Readonly</span>
+        </dt>
+        <dd class='desc'>
+          <p>References the Task that is currently running (if this CompositeTask has been told to execute in serial).</p>
+        </dd>
+        <dt id='errorMessages-property'>
+          <span class='signature'>
+            (Array&lt;String&gt;) <strong>errorMessages</strong>
+          </span>
+          <span class='note readonly title'>Readonly</span>
+        </dt>
+        <dd class='desc'>
+          <p>Unique error messages from all inner Tasks that failed during execution.
+This value is valid after during execution of the CompositeTask as well as upon completion (or failure).</p>
+        </dd>
+        <dt id='errorDatas-property'>
+          <span class='signature'>
+            (Array&lt;Object&gt;) <strong>errorDatas</strong>
+          </span>
+          <span class='note readonly title'>Readonly</span>
+        </dt>
+        <dd class='desc'>
+          <p>Error datas from all inner Tasks that failed during execution.
+This value is valid after during execution of the CompositeTask as well as upon completion (or failure).</p>
+        </dd>
+        <dt id='erroredTasks-property'>
+          <span class='signature'>
+            (Array&lt;Task&gt;) <strong>erroredTasks</strong>
+          </span>
+          <span class='note readonly title'>Readonly</span>
+        </dt>
+        <dd class='desc'>
+          <p>Tasks that errored during execution.
+This value is valid after during execution of the CompositeTask as well as upon completion (or failure).</p>
+        </dd>
+      </dl>
+      <h3 class='inherited'>
+        Properties inherited from
+        <a href='../classes/Task.html'>Task</a>
+      </h3>
+      <p class='inherited'>
+                <a href='../classes/Task.html#completed-property'>completed</a>,
+                <a href='../classes/Task.html#data-property'>data</a>,
+                <a href='../classes/Task.html#errored-property'>errored</a>,
+                <a href='../classes/Task.html#id-property'>id</a>,
+                <a href='../classes/Task.html#interrupted-property'>interrupted</a>,
+                <a href='../classes/Task.html#interruptingTask-property'>interruptingTask</a>,
+                <a href='../classes/Task.html#message-property'>message</a>,
+                <a href='../classes/Task.html#numInternalOperations-property'>numInternalOperations</a>,
+                <a href='../classes/Task.html#numInternalOperationsCompleted-property'>numInternalOperationsCompleted</a>,
+                <a href='../classes/Task.html#numInternalOperationsPending-property'>numInternalOperationsPending</a>,
+                <a href='../classes/Task.html#numTimesCompleted-property'>numTimesCompleted</a>,
+                <a href='../classes/Task.html#numTimesErrored-property'>numTimesErrored</a>,
+                <a href='../classes/Task.html#numTimesInterrupted-property'>numTimesInterrupted</a>,
+                <a href='../classes/Task.html#numTimesReset-property'>numTimesReset</a>,
+                <a href='../classes/Task.html#numTimesStarted-property'>numTimesStarted</a>,
+                <a href='../classes/Task.html#running-property'>running</a>,
+                <a href='../classes/Task.html#synchronous-property'>synchronous</a>,
+        <a href='../classes/Task.html#taskIdentifier-property'>taskIdentifier</a>
+      </p>
+      <h2>Instance Method Summary</h2>
+      <ul class='summary'>
+  <li>
+    <span class='signature'>
+      <a href='#constructor-instance'>
+        - (void) <strong>constructor</strong>(_taskQueue = [], _executeTaskInParallel = true, _taskIdentifier)
+      </a>
+    </span>
+    <span class='constructor note title'>Constructor</span>
+    <span class='desc'>
+      Constructor.
+    </span>
+  </li>
+  <li>
+    <span class='signature'>
+      <a href='#addTasksBeforeRun-instance'>
+        - (void) <strong>addTasksBeforeRun</strong>()
+      </a>
+    </span>
+    <span class='desc'>
+      Override this method to J.I.T.
+    </span>
+  </li>
+  <li>
+    <span class='signature'>
+      <a href='#individualTaskComplete-instance'>
+        - (void) <strong>individualTaskComplete</strong>()
+      </a>
+    </span>
+    <span class='desc'>
+      Override this method to be notified when individual Tasks have successfully completed.
+    </span>
+  </li>
+  <li>
+    <span class='signature'>
+      <a href='#individualTaskStarted-instance'>
+        - (void) <strong>individualTaskStarted</strong>()
+      </a>
+    </span>
+    <span class='desc'>
+      Override this method to be notified when individual Tasks are started.
+    </span>
+  </li>
+</ul>
+      <h2>
+        <small>Inherited Method Summary</small>
+      </h2>
+      <h3 class='inherited'>
+        Methods inherited from
+        <a href='../classes/Task.html'>Task</a>
+      </h3>
+      <p class='inherited'>
+                <a href='../classes/Task.html#constructor-instance'>#constructor</a>,
+                <a href='../classes/Task.html#reset-instance'>#reset</a>,
+                <a href='../classes/Task.html#run-instance'>#run</a>,
+                <a href='../classes/Task.html#customRun-instance'>#customRun</a>,
+                <a href='../classes/Task.html#customInterrupt-instance'>#customInterrupt</a>,
+                <a href='../classes/Task.html#customReset-instance'>#customReset</a>,
+                <a href='../classes/Task.html#withCompleteHandler-instance'>#withCompleteHandler</a>,
+                <a href='../classes/Task.html#removeCompleteHandler-instance'>#removeCompleteHandler</a>,
+                <a href='../classes/Task.html#withErrorHandler-instance'>#withErrorHandler</a>,
+                <a href='../classes/Task.html#removeErrorHandler-instance'>#removeErrorHandler</a>,
+                <a href='../classes/Task.html#withFinalHandler-instance'>#withFinalHandler</a>,
+                <a href='../classes/Task.html#removeFinalHandler-instance'>#removeFinalHandler</a>,
+                <a href='../classes/Task.html#withInterruptHandler-instance'>#withInterruptHandler</a>,
+                <a href='../classes/Task.html#removeInterruptHandler-instance'>#removeInterruptHandler</a>,
+                <a href='../classes/Task.html#withStartHandler-instance'>#withStartHandler</a>,
+                <a href='../classes/Task.html#removeStartHandler-instance'>#removeStartHandler</a>,
+                <a href='../classes/Task.html#taskComplete-instance'>#taskComplete</a>,
+        <a href='../classes/Task.html#taskError-instance'>#taskError</a>
+      </p>
+      <h3 class='inherited'>
+        Methods inherited from
+        <a href='../classes/EventDispatcher.html'>EventDispatcher</a>
+      </h3>
+      <p class='inherited'>
+                <a href='../classes/EventDispatcher.html#addListener-instance'>#addListener</a>,
+                <a href='../classes/EventDispatcher.html#removeListener-instance'>#removeListener</a>,
+                <a href='../classes/EventDispatcher.html#dispatch-instance'>#dispatch</a>,
+                <a href='../classes/EventDispatcher.html#hasListeners-instance'>#hasListeners</a>,
+        <a href='../classes/EventDispatcher.html#removeAllListeners-instance'>#removeAllListeners</a>
+      </p>
+      <h2>Constructor Details</h2>
+      <div class='methods'>
+  <div class='method_details'>
+    <p class='signature' id='constructor-instance'>
+      - (void) <strong>constructor</strong>(_taskQueue = [], _executeTaskInParallel = true, _taskIdentifier)
+    </p>
+    <div class='docstring'>
+  <p>Constructor.</p>
+</div>
+<div class='tags'>
+  <h3>Parameters:</h3>
+  <ul class='param'>
+    <li>
+      <span class='name'>taskQueue</span>
+      <span class='type'>
+        (<tt>Array&lt;<a href='../classes/Task.html'>Task</a>&gt;</tt>)
+      </span>
+      &mdash;
+      <span class='desc'>Set of Tasks and/or functions to be executed.</span>
+    </li>
+    <li>
+      <span class='name'>executeTaskInParallel</span>
+      <span class='type'>
+        (<tt>Boolean</tt>)
+      </span>
+      &mdash;
+      <span class='desc'>Execute all Tasks at the same time; if this value is FALSE Tasks will be executed in serial.</span>
+    </li>
+    <li>
+      <span class='name'>taskIdentifier</span>
+      <span class='type'>
+        (<tt>String</tt>)
+      </span>
+      &mdash;
+      <span class='desc'>Optional human-readable label for Task-instance; can be useful for debugging or logging purposes.</span>
+    </li>
+  </ul>
+</div>
+  </div>
+</div>
+      <h2>Instance Method Details</h2>
+      <div class='methods'>
+  <div class='method_details'>
+    <p class='signature' id='addTasksBeforeRun-instance'>
+      - (void) <strong>addTasksBeforeRun</strong>()
+    </p>
+    <div class='docstring'>
+  <p>Override this method to J.I.T. add child Tasks before the composite Task is run.</p>
+</div>
+<div class='tags'>
+</div>
+  </div>
+  <div class='method_details'>
+    <p class='signature' id='individualTaskComplete-instance'>
+      - (void) <strong>individualTaskComplete</strong>()
+    </p>
+    <div class='docstring'>
+  <p>Override this method to be notified when individual Tasks have successfully completed.</p>
+</div>
+<div class='tags'>
+</div>
+  </div>
+  <div class='method_details'>
+    <p class='signature' id='individualTaskStarted-instance'>
+      - (void) <strong>individualTaskStarted</strong>()
+    </p>
+    <div class='docstring'>
+  <p>Override this method to be notified when individual Tasks are started.</p>
+</div>
+<div class='tags'>
+</div>
+  </div>
+</div>
+    </div>
+    <div id='footer'>
+  Generated on
+  Wed May 15 2013 23:18:44 GMT-0400 (EDT)
+  by
+  <a href='https://github.com/netzpirat/codo' title='CoffeeScript API documentation generator'>Codo</a>
+  v1.6.2
+  (Node.js v0.10.5).
+  &#10034;
+  Press Ctrl-h to see the keyboard shortcuts
+  &#10034;
+  <a href='http://twitter.com/#!/netzpirat'>@netzpirat</a>
+  &#10034;
+  <a href='https://mksoft.ch'>mksoft.ch</a>
+</div>
+  </body>
+</html>
