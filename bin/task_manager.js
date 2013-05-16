@@ -2,10 +2,10 @@
 /*
 Base class for objects supporting event dispatching.
 
-Big thanks to [adrianwiecek](http://adrianwiecek.com/2012/02/24/coffeescript-eventdispatcher/) for inspiring this class.
+@author [Brian Vaughn](http://www.briandavidvaughn.com), [Adrian Wiecek](http://adrianwiecek.com/2012/02/24/coffeescript-eventdispatcher/)
 */
 
-var Closure, CompositeTask, Event, EventDispatcher, Task, TaskWithClosure,
+var Closure, CompositeTask, Event, EventDispatcher, Task, TaskEvent, TaskWithClosure, _ref,
   __hasProp = {}.hasOwnProperty,
   __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; },
   __slice = [].slice;
@@ -26,9 +26,12 @@ EventDispatcher = (function() {
   */
 
 
-  EventDispatcher.prototype.addListener = function(eventType, callback, thisScope) {
+  EventDispatcher.prototype.addEventListener = function(eventType, callback, thisScope) {
     var closure, newClosure, _i, _len, _ref;
 
+    if (!this.closures) {
+      this.closures = {};
+    }
     if (!this.closures[eventType]) {
       this.closures[eventType] = [];
     }
@@ -51,10 +54,13 @@ EventDispatcher = (function() {
   */
 
 
-  EventDispatcher.prototype.removeListener = function(eventType, callback, thisScope) {
+  EventDispatcher.prototype.removeEventListener = function(eventType, callback, thisScope) {
     var closure, index, newClosure, _i, _len, _ref, _results;
 
-    if (!this.hasListeners(eventType)) {
+    if (!this.closures) {
+      this.closures = {};
+    }
+    if (!this.hasEventListeners(eventType)) {
       return;
     }
     newClosure = new Closure(callback, thisScope);
@@ -78,10 +84,13 @@ EventDispatcher = (function() {
   */
 
 
-  EventDispatcher.prototype.dispatch = function(event) {
+  EventDispatcher.prototype.dispatchEvent = function(event) {
     var closure, _i, _len, _ref, _results;
 
-    if (!this.hasListeners(eventType)) {
+    if (!this.closures) {
+      this.closures = {};
+    }
+    if (!this.hasEventListeners(event.eventType)) {
       return;
     }
     event.target = this;
@@ -100,7 +109,10 @@ EventDispatcher = (function() {
   */
 
 
-  EventDispatcher.prototype.hasListeners = function(eventType) {
+  EventDispatcher.prototype.hasEventListeners = function(eventType) {
+    if (!this.closures) {
+      this.closures = {};
+    }
     return this.closures[eventType] && this.closures[eventType].length > 0;
   };
 
@@ -109,7 +121,7 @@ EventDispatcher = (function() {
   */
 
 
-  EventDispatcher.prototype.removeAllListeners = function() {
+  EventDispatcher.prototype.removeAllEventListeners = function() {
     return this.closures = {};
   };
 
@@ -565,7 +577,7 @@ Task = (function(_super) {
 
 
   Task.prototype.taskComplete = function(message, data) {
-    var completeHandler, finalHandler, _i, _j, _len, _len1, _ref, _ref1, _results;
+    var completeHandler, finalHandler, _i, _j, _len, _len1, _ref, _ref1;
 
     if (message == null) {
       message = "";
@@ -588,17 +600,17 @@ Task = (function(_super) {
       completeHandler = _ref[_i];
       this.executeTaskStateChangeClosure(completeHandler);
     }
+    this.dispatchEvent(new TaskEvent(TaskEvent.COMPLETE));
     _ref1 = this._finalHandlers;
-    _results = [];
     for (_j = 0, _len1 = _ref1.length; _j < _len1; _j++) {
       finalHandler = _ref1[_j];
-      _results.push(this.executeTaskStateChangeClosure(finalHandler));
+      this.executeTaskStateChangeClosure(finalHandler);
     }
-    return _results;
+    return this.dispatchEvent(new TaskEvent(TaskEvent.FINAL));
   };
 
   Task.prototype.taskError = function(message, data) {
-    var errorHandler, finalHandler, _i, _j, _len, _len1, _ref, _ref1, _results;
+    var errorHandler, finalHandler, _i, _j, _len, _len1, _ref, _ref1;
 
     if (message == null) {
       message = "";
@@ -621,13 +633,13 @@ Task = (function(_super) {
       errorHandler = _ref[_i];
       this.executeTaskStateChangeClosure(errorHandler);
     }
+    this.dispatchEvent(new TaskEvent(TaskEvent.ERROR));
     _ref1 = this._finalHandlers;
-    _results = [];
     for (_j = 0, _len1 = _ref1.length; _j < _len1; _j++) {
       finalHandler = _ref1[_j];
-      _results.push(this.executeTaskStateChangeClosure(finalHandler));
+      this.executeTaskStateChangeClosure(finalHandler);
     }
-    return _results;
+    return this.dispatchEvent(new TaskEvent(TaskEvent.FINAL));
   };
 
   return Task;
@@ -677,7 +689,8 @@ TaskWithClosure = (function(_super) {
 
 /*
 # Base class for events. #
-Big thanks to [adrianwiecek](http://adrianwiecek.com/2012/02/24/coffeescript-eventdispatcher/)
+
+@author [Brian Vaughn](http://www.briandavidvaughn.com)
 */
 
 
@@ -736,6 +749,91 @@ Event = (function() {
 }).call(this);
 
 /*
+Dispatched by a Task to indicated a change in state.
+
+@author [Brian Vaughn](http://www.briandavidvaughn.com)
+*/
+
+
+TaskEvent = (function(_super) {
+  var get, set,
+    _this = this;
+
+  __extends(TaskEvent, _super);
+
+  function TaskEvent() {
+    _ref = TaskEvent.__super__.constructor.apply(this, arguments);
+    return _ref;
+  }
+
+  get = function(props) {
+    var getter, name, _results;
+
+    _results = [];
+    for (name in props) {
+      getter = props[name];
+      _results.push(TaskEvent.prototype.__defineGetter__(name, getter));
+    }
+    return _results;
+  };
+
+  set = function(props) {
+    var name, setter, _results;
+
+    _results = [];
+    for (name in props) {
+      setter = props[name];
+      _results.push(TaskEvent.prototype.__defineSetter__(name, setter));
+    }
+    return _results;
+  };
+
+  /*
+  A task has completed successfully.
+  */
+
+
+  TaskEvent.COMPLETE = "TaskEvent.COMPLETE";
+
+  /*
+  A task has failed.
+  */
+
+
+  TaskEvent.ERROR = "TaskEvent.ERROR";
+
+  /*
+  A task has either completed or failed.
+  */
+
+
+  TaskEvent.FINAL = "TaskEvent.FINAL";
+
+  /*
+  A task has started running.
+  */
+
+
+  TaskEvent.STARTED = "TaskEvent.STARTED";
+
+  /*
+  A Task has been interrupted.
+  */
+
+
+  TaskEvent.INTERRUPTED = "TaskEvent.INTERRUPTED";
+
+  get({
+    task: function() {
+      return this.target;
+    }
+  });
+
+  return TaskEvent;
+
+}).call(this, Event);
+
+/*
 Wraps a set of ITasks and executes them in parallel or serial, as specified by a boolean constructor arg.
 
 @author [Brian Vaughn](http://www.briandavidvaughn.com)
@@ -790,7 +888,7 @@ CompositeTask = (function(_super) {
   }
 
   CompositeTask.prototype.customRun = function() {
-    var task, _i, _j, _len, _len1, _ref, _ref1, _results;
+    var task, _i, _j, _len, _len1, _ref1, _ref2, _results;
 
     if (!this._addTasksBeforeRunInvoked) {
       this.addTasksBeforeRun();
@@ -801,16 +899,16 @@ CompositeTask = (function(_super) {
       return;
     }
     this._erroredTasks = [];
-    _ref = this._taskQueue;
-    for (_i = 0, _len = _ref.length; _i < _len; _i++) {
-      task = _ref[_i];
+    _ref1 = this._taskQueue;
+    for (_i = 0, _len = _ref1.length; _i < _len; _i++) {
+      task = _ref1[_i];
       this.addTaskEventListeners(task);
     }
     if (this._executeTaskInParallel) {
-      _ref1 = this._taskQueue;
+      _ref2 = this._taskQueue;
       _results = [];
-      for (_j = 0, _len1 = _ref1.length; _j < _len1; _j++) {
-        task = _ref1[_j];
+      for (_j = 0, _len1 = _ref2.length; _j < _len1; _j++) {
+        task = _ref2[_j];
         _results.push(task.run());
       }
       return _results;
@@ -828,11 +926,11 @@ CompositeTask = (function(_super) {
 
   get({
     allTasksAreCompleted: function() {
-      var task, _i, _len, _ref;
+      var task, _i, _len, _ref1;
 
-      _ref = this._taskQueue;
-      for (_i = 0, _len = _ref.length; _i < _len; _i++) {
-        task = _ref[_i];
+      _ref1 = this._taskQueue;
+      for (_i = 0, _len = _ref1.length; _i < _len; _i++) {
+        task = _ref1[_i];
         if (!task.completed) {
           return false;
         }
@@ -853,12 +951,12 @@ CompositeTask = (function(_super) {
 
   get({
     errorMessages: function() {
-      var returnArray, task, _i, _len, _ref;
+      var returnArray, task, _i, _len, _ref1;
 
       returnArray = [];
-      _ref = this._erroredTasks;
-      for (_i = 0, _len = _ref.length; _i < _len; _i++) {
-        task = _ref[_i];
+      _ref1 = this._erroredTasks;
+      for (_i = 0, _len = _ref1.length; _i < _len; _i++) {
+        task = _ref1[_i];
         returnArray.push(task.message);
       }
       return returnArray;
@@ -867,12 +965,12 @@ CompositeTask = (function(_super) {
 
   get({
     errorDatas: function() {
-      var returnArray, task, _i, _len, _ref;
+      var returnArray, task, _i, _len, _ref1;
 
       returnArray = [];
-      _ref = this._erroredTasks;
-      for (_i = 0, _len = _ref.length; _i < _len; _i++) {
-        task = _ref[_i];
+      _ref1 = this._erroredTasks;
+      for (_i = 0, _len = _ref1.length; _i < _len; _i++) {
+        task = _ref1[_i];
         returnArray.push(task.data);
       }
       return returnArray;

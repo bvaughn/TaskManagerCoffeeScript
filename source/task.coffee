@@ -329,8 +329,12 @@ class Task extends EventDispatcher
     for completeHandler in @_completeHandlers
       @executeTaskStateChangeClosure( completeHandler )
 
+    @dispatchEvent( new TaskEvent( TaskEvent.COMPLETE ) )
+
     for finalHandler in @_finalHandlers
       @executeTaskStateChangeClosure( finalHandler )
+
+    @dispatchEvent( new TaskEvent( TaskEvent.FINAL ) )
 
   # This method should be called upon Task failure.
   # Typically this method should only be called by a Task, internally.
@@ -352,5 +356,9 @@ class Task extends EventDispatcher
     for errorHandler in @_errorHandlers
       @executeTaskStateChangeClosure( errorHandler )
 
+    @dispatchEvent( new TaskEvent( TaskEvent.ERROR ) )
+
     for finalHandler in @_finalHandlers
       @executeTaskStateChangeClosure( finalHandler )
+
+    @dispatchEvent( new TaskEvent( TaskEvent.FINAL ) )

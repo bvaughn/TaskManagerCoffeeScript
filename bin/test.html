@@ -13,6 +13,10 @@
 			console.log( task.taskIdentifier + " started" );
 		}
 		
+		function eventHandler( event ) {
+			console.log( event.task.taskIdentifier + " dispatched event type " + event.eventType );
+		}
+		
 		function runCompositeTask( executeTaskInParallel ) {
 			console.clear();
 			
@@ -42,6 +46,10 @@
 					}, true, "Synchronous Task C" ).
 				withStartHandler( taskStartHandler ).
 				withCompleteHandler( taskCompleteHandler );
+			
+			taskA.addEventListener( TaskEvent.COMPLETE, eventHandler, this );
+			taskB.addEventListener( TaskEvent.COMPLETE, eventHandler, this );
+			taskC.addEventListener( TaskEvent.COMPLETE, eventHandler, this );
 			
 			new CompositeTask( [ taskA, taskB, taskC ], executeTaskInParallel, "Composite task" ).
 				withStartHandler( taskStartHandler ).

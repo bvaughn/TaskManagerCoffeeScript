@@ -1,6 +1,7 @@
 ###
 # Base class for events. #
-Big thanks to [adrianwiecek](http://adrianwiecek.com/2012/02/24/coffeescript-eventdispatcher/)
+
+@author [Brian Vaughn](http://www.briandavidvaughn.com)
 ###
 class Event
 

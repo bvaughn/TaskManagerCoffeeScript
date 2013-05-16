@@ -1,7 +1,7 @@
 ###
 Base class for objects supporting event dispatching.
 
-Big thanks to [adrianwiecek](http://adrianwiecek.com/2012/02/24/coffeescript-eventdispatcher/) for inspiring this class.
+@author [Brian Vaughn](http://www.briandavidvaughn.com), [Adrian Wiecek](http://adrianwiecek.com/2012/02/24/coffeescript-eventdispatcher/)
 ###
 class EventDispatcher
 
@@ -17,8 +17,11 @@ class EventDispatcher
   @param callback [Function] Function accepting 1 parameter of type `Event`
   @param thisScope [Object] The *this* scope to apply to the callback method
   ###
-  addListener: (eventType, callback, thisScope) ->
-    if not @closures[eventType]
+  addEventListener: (eventType, callback, thisScope) ->
+    unless @closures
+      @closures = {}
+
+    unless @closures[eventType]
       @closures[eventType] = []
 
     newClosure = new Closure( callback, thisScope )
@@ -35,8 +38,11 @@ class EventDispatcher
   @param callback [Function] Function
   @param thisScope [Object] The *this* scope to apply to the callback method
   ###
-  removeListener: (eventType, callback, thisScope) ->
-    return unless this.hasListeners( eventType )
+  removeEventListener: (eventType, callback, thisScope) ->
+    unless @closures
+      @closures = {}
+
+    return unless @hasEventListeners( eventType )
 
     newClosure = new Closure( callback, thisScope )
 
@@ -49,22 +55,29 @@ class EventDispatcher
   Invokes all registered callbacks for specified event.
   @param event [Event] Event to dispatch
   ###
-  dispatch: (event) ->
-    return unless this.hasListeners( eventType )
+  dispatchEvent: (event) ->
+    unless @closures
+      @closures = {}
+
+    return unless @hasEventListeners( event.eventType )
 
     event.target = this
 
-    closure.execute( event ) for closure in @closures[ event.eventType ]
+    for closure in @closures[ event.eventType ]
+      closure.execute( event )
  
   ###
   Returns true if there are any callbacks registered for specified eventType.
   @param eventType [String] Event type / name
   ###
-  hasListeners: (eventType) ->
+  hasEventListeners: (eventType) ->
+    unless @closures
+      @closures = {}
+
     @closures[ eventType ] and @closures[ eventType ].length > 0
  
   ###
   Removes all registered callbacks.
   ###
-  removeAllListeners: ->
+  removeAllEventListeners: ->
     @closures = {}

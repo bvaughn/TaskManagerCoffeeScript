@@ -15,7 +15,7 @@
     &raquo;
     <a href='../class_index.html' title='Index'>Index</a>
     &raquo;
-    <span class='title'>Event</span>
+    <span class='title'>TaskEvent</span>
     <nav>
       <ul>
         <li class='noframes'>
@@ -105,18 +105,23 @@
     <div id='content'>
       <h1>
         Class:
-        Event
+        TaskEvent
       </h1>
       <table class='box'>
         <tr>
           <td>Defined in:</td>
-          <td>.&#47;source&#47;event.coffee</td>
+          <td>.&#47;source&#47;task_event.coffee</td>
+        </tr>
+        <tr>
+          <td>Inherits:</td>
+          <td>
+            <a href='../classes/Event.html'>Event</a>
+          </td>
         </tr>
       </table>
       <h2>Overview</h2>
       <div class='docstring'>
-  <h1>Base class for events.</h1>
-
+  <p>Dispatched by a Task to indicated a change in state.</p>
 </div>
 <div class='tags'>
   <h3>Author:</h3>
@@ -126,67 +131,98 @@
     </li>
   </ul>
 </div>
-      <h2>Direct Known Subclasses</h2>
-      <p class='children'>
-        <a href='../classes/TaskEvent.html'>TaskEvent</a>
-      </p>
       <h2>Property Summary</h2>
       <dl class='properties'>
-        <dt id='target-property'>
+        <dt id='task-property'>
           <span class='signature'>
-            (EventDispatcher) <strong>target</strong>
+            (Task) <strong>task</strong>
           </span>
+          <span class='note readonly title'>Readonly</span>
         </dt>
         <dd class='desc'>
-          <p>Dispatcher of this Event</p>
+          <p>The Task this event is describing</p>
         </dd>
       </dl>
-      <h2>Instance Method Summary</h2>
-      <ul class='summary'>
-  <li>
-    <span class='signature'>
-      <a href='#constructor-instance'>
-        - (void) <strong>constructor</strong>(eventType, data)
-      </a>
-    </span>
-    <span class='constructor note title'>Constructor</span>
-    <span class='desc'>
-      This is the constructor.
-    </span>
-  </li>
-</ul>
-      <h2>Constructor Details</h2>
-      <div class='methods'>
-  <div class='method_details'>
-    <p class='signature' id='constructor-instance'>
-      - (void) <strong>constructor</strong>(eventType, data)
-    </p>
-    <div class='docstring'>
-  <p>This is the constructor.</p>
+      <h3 class='inherited'>
+        Properties inherited from
+        <a href='../classes/Event.html'>Event</a>
+      </h3>
+      <p class='inherited'>
+        <a href='../classes/Event.html#target-property'>target</a>
+      </p>
+      <h2>Constant Summary</h2>
+      <dl class='constants'>
+        <dt id='COMPLETE-constant'>
+          COMPLETE
+          =
+          <div class='docstring'>
+  <p>A task has completed successfully.</p>
 </div>
 <div class='tags'>
-  <h3>Parameters:</h3>
-  <ul class='param'>
-    <li>
-      <span class='name'>event</span>
-      <span class='type'>
-        (<tt>String</tt>)
-      </span>
-      &mdash;
-      <span class='desc'>type/name</span>
-    </li>
-    <li>
-      <span class='name'>optional</span>
-      <span class='type'>
-        (<tt>Object</tt>)
-      </span>
-      &mdash;
-      <span class='desc'>event data</span>
-    </li>
-  </ul>
 </div>
-  </div>
+        </dt>
+        <dd>
+          <pre><code class='coffee'>"TaskEvent.COMPLETE"</code></pre>
+        </dd>
+        <dt id='ERROR-constant'>
+          ERROR
+          =
+          <div class='docstring'>
+  <p>A task has failed.</p>
 </div>
+<div class='tags'>
+</div>
+        </dt>
+        <dd>
+          <pre><code class='coffee'>"TaskEvent.ERROR"</code></pre>
+        </dd>
+        <dt id='FINAL-constant'>
+          FINAL
+          =
+          <div class='docstring'>
+  <p>A task has either completed or failed.</p>
+</div>
+<div class='tags'>
+</div>
+        </dt>
+        <dd>
+          <pre><code class='coffee'>"TaskEvent.FINAL"</code></pre>
+        </dd>
+        <dt id='STARTED-constant'>
+          STARTED
+          =
+          <div class='docstring'>
+  <p>A task has started running.</p>
+</div>
+<div class='tags'>
+</div>
+        </dt>
+        <dd>
+          <pre><code class='coffee'>"TaskEvent.STARTED"</code></pre>
+        </dd>
+        <dt id='INTERRUPTED-constant'>
+          INTERRUPTED
+          =
+          <div class='docstring'>
+  <p>A Task has been interrupted.</p>
+</div>
+<div class='tags'>
+</div>
+        </dt>
+        <dd>
+          <pre><code class='coffee'>"TaskEvent.INTERRUPTED"</code></pre>
+        </dd>
+      </dl>
+      <h2>
+        <small>Inherited Method Summary</small>
+      </h2>
+      <h3 class='inherited'>
+        Methods inherited from
+        <a href='../classes/Event.html'>Event</a>
+      </h3>
+      <p class='inherited'>
+        <a href='../classes/Event.html#constructor-instance'>#constructor</a>
+      </p>
     </div>
     <div id='footer'>
   Generated on
