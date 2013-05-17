@@ -372,7 +372,7 @@ This value is FALSE if the task has not been run, has completed run (succesfully
   <li>
     <span class='signature'>
       <a href='#withCompleteHandler-instance'>
-        - (void) <strong>withCompleteHandler</strong>(closure)
+        - (void) <strong>withCompleteHandler</strong>(methodOrProxy)
       </a>
     </span>
     <span class='desc'>
@@ -382,17 +382,17 @@ This value is FALSE if the task has not been run, has completed run (succesfully
   <li>
     <span class='signature'>
       <a href='#removeCompleteHandler-instance'>
-        - (void) <strong>removeCompleteHandler</strong>(closure)
+        - (void) <strong>removeCompleteHandler</strong>(methodOrProxy)
       </a>
     </span>
     <span class='desc'>
-      
+      Removes a registered Task-completed handler.
     </span>
   </li>
   <li>
     <span class='signature'>
       <a href='#withErrorHandler-instance'>
-        - (void) <strong>withErrorHandler</strong>(closure)
+        - (void) <strong>withErrorHandler</strong>(methodOrProxy)
       </a>
     </span>
     <span class='desc'>
@@ -402,17 +402,17 @@ This value is FALSE if the task has not been run, has completed run (succesfully
   <li>
     <span class='signature'>
       <a href='#removeErrorHandler-instance'>
-        - (void) <strong>removeErrorHandler</strong>(closure)
+        - (void) <strong>removeErrorHandler</strong>(methodOrProxy)
       </a>
     </span>
     <span class='desc'>
-      
+      Removes a registered Task-errorred handler.
     </span>
   </li>
   <li>
     <span class='signature'>
       <a href='#withFinalHandler-instance'>
-        - (void) <strong>withFinalHandler</strong>(closure)
+        - (void) <strong>withFinalHandler</strong>(methodOrProxy)
       </a>
     </span>
     <span class='desc'>
@@ -422,17 +422,17 @@ This value is FALSE if the task has not been run, has completed run (succesfully
   <li>
     <span class='signature'>
       <a href='#removeFinalHandler-instance'>
-        - (void) <strong>removeFinalHandler</strong>(closure)
+        - (void) <strong>removeFinalHandler</strong>(methodOrProxy)
       </a>
     </span>
     <span class='desc'>
-      
+      Removes a registered final handler.
     </span>
   </li>
   <li>
     <span class='signature'>
       <a href='#withInterruptHandler-instance'>
-        - (void) <strong>withInterruptHandler</strong>(closure)
+        - (void) <strong>withInterruptHandler</strong>(methodOrProxy)
       </a>
     </span>
     <span class='desc'>
@@ -442,17 +442,17 @@ This value is FALSE if the task has not been run, has completed run (succesfully
   <li>
     <span class='signature'>
       <a href='#removeInterruptHandler-instance'>
-        - (void) <strong>removeInterruptHandler</strong>(closure)
+        - (void) <strong>removeInterruptHandler</strong>(methodOrProxy)
       </a>
     </span>
     <span class='desc'>
-      
+      Removes a registered Task-interrupted handler.
     </span>
   </li>
   <li>
     <span class='signature'>
       <a href='#withStartHandler-instance'>
-        - (void) <strong>withStartHandler</strong>(closure)
+        - (void) <strong>withStartHandler</strong>(methodOrProxy)
       </a>
     </span>
     <span class='desc'>
@@ -462,11 +462,11 @@ This value is FALSE if the task has not been run, has completed run (succesfully
   <li>
     <span class='signature'>
       <a href='#removeStartHandler-instance'>
-        - (void) <strong>removeStartHandler</strong>(closure)
+        - (void) <strong>removeStartHandler</strong>(methodOrProxy)
       </a>
     </span>
     <span class='desc'>
-      
+      Removes a registered Task-started handler.
     </span>
   </li>
   <li>
@@ -498,11 +498,11 @@ This value is FALSE if the task has not been run, has completed run (succesfully
         <a href='../classes/EventDispatcher.html'>EventDispatcher</a>
       </h3>
       <p class='inherited'>
-                <a href='../classes/EventDispatcher.html#addListener-instance'>#addListener</a>,
-                <a href='../classes/EventDispatcher.html#removeListener-instance'>#removeListener</a>,
-                <a href='../classes/EventDispatcher.html#dispatch-instance'>#dispatch</a>,
-                <a href='../classes/EventDispatcher.html#hasListeners-instance'>#hasListeners</a>,
-        <a href='../classes/EventDispatcher.html#removeAllListeners-instance'>#removeAllListeners</a>
+                <a href='../classes/EventDispatcher.html#addEventListener-instance'>#addEventListener</a>,
+                <a href='../classes/EventDispatcher.html#removeEventListener-instance'>#removeEventListener</a>,
+                <a href='../classes/EventDispatcher.html#dispatchEvent-instance'>#dispatchEvent</a>,
+                <a href='../classes/EventDispatcher.html#hasEventListeners-instance'>#hasEventListeners</a>,
+        <a href='../classes/EventDispatcher.html#removeAllEventListeners-instance'>#removeAllEventListeners</a>
       </p>
       <h2>Constructor Details</h2>
       <div class='methods'>
@@ -630,147 +630,217 @@ This method may be used to retry an errored Task or to resume an interrupted Tas
   </div>
   <div class='method_details'>
     <p class='signature' id='withCompleteHandler-instance'>
-      - (void) <strong>withCompleteHandler</strong>(closure)
+      - (void) <strong>withCompleteHandler</strong>(methodOrProxy)
     </p>
     <div class='docstring'>
   <p>The provided function will be invoked only upon successful completion of the task.
-Function can accept 0 arguments or 1 argument (the current Task)</p>
+Function should accept 1 parameter of type <Task></p>
 </div>
 <div class='tags'>
   <h3>Parameters:</h3>
   <ul class='param'>
     <li>
-      <span class='name'>closure</span>
+      <span class='name'>methodOrProxy</span>
       <span class='type'>
-        (<tt><a href='../classes/Closure.html'>Closure</a></tt>)
+        (<tt><a href='../classes/Proxy.html'>Proxy</a></tt>)
       </span>
       &mdash;
-      <span class='desc'>Function with &quot;this&quot; scope</span>
+      <span class='desc'>Function or Proxy; If a function is provided it will be converted to a Proxy with a &quot;this&quot; scope of this Task.</span>
     </li>
   </ul>
 </div>
   </div>
   <div class='method_details'>
     <p class='signature' id='removeCompleteHandler-instance'>
-      - (void) <strong>removeCompleteHandler</strong>(closure)
-    </p>
-    <div class='tags'>
-</div>
-  </div>
-  <div class='method_details'>
-    <p class='signature' id='withErrorHandler-instance'>
-      - (void) <strong>withErrorHandler</strong>(closure)
+      - (void) <strong>removeCompleteHandler</strong>(methodOrProxy)
     </p>
     <div class='docstring'>
-  <p>The provided function will be invoked only upon failure of the task.
-Function can accept 0 arguments or 1 argument (the current Task)</p>
+  <p>Removes a registered Task-completed handler.</p>
 </div>
 <div class='tags'>
   <h3>Parameters:</h3>
   <ul class='param'>
     <li>
-      <span class='name'>closure</span>
+      <span class='name'>methodOrProxy</span>
       <span class='type'>
-        (<tt><a href='../classes/Closure.html'>Closure</a></tt>)
+        (<tt><a href='../classes/Proxy.html'>Proxy</a></tt>)
       </span>
       &mdash;
-      <span class='desc'>Function with &quot;this&quot; scope</span>
+      <span class='desc'>Function or Proxy; If a function is provided it will be converted to a Proxy with a &quot;this&quot; scope of this Task.</span>
+    </li>
+  </ul>
+</div>
+  </div>
+  <div class='method_details'>
+    <p class='signature' id='withErrorHandler-instance'>
+      - (void) <strong>withErrorHandler</strong>(methodOrProxy)
+    </p>
+    <div class='docstring'>
+  <p>The provided function will be invoked only upon failure of the task.
+Function should accept 1 parameter of type <Task></p>
+</div>
+<div class='tags'>
+  <h3>Parameters:</h3>
+  <ul class='param'>
+    <li>
+      <span class='name'>methodOrProxy</span>
+      <span class='type'>
+        (<tt><a href='../classes/Proxy.html'>Proxy</a></tt>)
+      </span>
+      &mdash;
+      <span class='desc'>Function or Proxy; If a function is provided it will be converted to a Proxy with a &quot;this&quot; scope of this Task.</span>
     </li>
   </ul>
 </div>
   </div>
   <div class='method_details'>
     <p class='signature' id='removeErrorHandler-instance'>
-      - (void) <strong>removeErrorHandler</strong>(closure)
-    </p>
-    <div class='tags'>
-</div>
-  </div>
-  <div class='method_details'>
-    <p class='signature' id='withFinalHandler-instance'>
-      - (void) <strong>withFinalHandler</strong>(closure)
+      - (void) <strong>removeErrorHandler</strong>(methodOrProxy)
     </p>
     <div class='docstring'>
-  <p>This handler is invoked upon either success or failure of the Task.
-Function can accept 0 arguments or 1 argument (the current Task)</p>
+  <p>Removes a registered Task-errorred handler.</p>
 </div>
 <div class='tags'>
   <h3>Parameters:</h3>
   <ul class='param'>
     <li>
-      <span class='name'>closure</span>
+      <span class='name'>methodOrProxy</span>
       <span class='type'>
-        (<tt><a href='../classes/Closure.html'>Closure</a></tt>)
+        (<tt><a href='../classes/Proxy.html'>Proxy</a></tt>)
       </span>
       &mdash;
-      <span class='desc'>Function with &quot;this&quot; scope</span>
+      <span class='desc'>Function or Proxy; If a function is provided it will be converted to a Proxy with a &quot;this&quot; scope of this Task.</span>
+    </li>
+  </ul>
+</div>
+  </div>
+  <div class='method_details'>
+    <p class='signature' id='withFinalHandler-instance'>
+      - (void) <strong>withFinalHandler</strong>(methodOrProxy)
+    </p>
+    <div class='docstring'>
+  <p>This handler is invoked upon either success or failure of the Task.
+Function should accept 1 parameter of type <Task></p>
+</div>
+<div class='tags'>
+  <h3>Parameters:</h3>
+  <ul class='param'>
+    <li>
+      <span class='name'>methodOrProxy</span>
+      <span class='type'>
+        (<tt><a href='../classes/Proxy.html'>Proxy</a></tt>)
+      </span>
+      &mdash;
+      <span class='desc'>Function or Proxy; If a function is provided it will be converted to a Proxy with a &quot;this&quot; scope of this Task.</span>
     </li>
   </ul>
 </div>
   </div>
   <div class='method_details'>
     <p class='signature' id='removeFinalHandler-instance'>
-      - (void) <strong>removeFinalHandler</strong>(closure)
-    </p>
-    <div class='tags'>
-</div>
-  </div>
-  <div class='method_details'>
-    <p class='signature' id='withInterruptHandler-instance'>
-      - (void) <strong>withInterruptHandler</strong>(closure)
+      - (void) <strong>removeFinalHandler</strong>(methodOrProxy)
     </p>
     <div class='docstring'>
-  <p>The provided function will be invoked only upon interruption of the Task.
-Function can accept 0 arguments or 1 argument (the current Task)</p>
+  <p>Removes a registered final handler.</p>
 </div>
 <div class='tags'>
   <h3>Parameters:</h3>
   <ul class='param'>
     <li>
-      <span class='name'>closure</span>
+      <span class='name'>methodOrProxy</span>
       <span class='type'>
-        (<tt><a href='../classes/Closure.html'>Closure</a></tt>)
+        (<tt><a href='../classes/Proxy.html'>Proxy</a></tt>)
       </span>
       &mdash;
-      <span class='desc'>Function with &quot;this&quot; scope</span>
+      <span class='desc'>Function or Proxy; If a function is provided it will be converted to a Proxy with a &quot;this&quot; scope of this Task.</span>
+    </li>
+  </ul>
+</div>
+  </div>
+  <div class='method_details'>
+    <p class='signature' id='withInterruptHandler-instance'>
+      - (void) <strong>withInterruptHandler</strong>(methodOrProxy)
+    </p>
+    <div class='docstring'>
+  <p>The provided function will be invoked only upon interruption of the Task.
+Function should accept 1 parameter of type <Task></p>
+</div>
+<div class='tags'>
+  <h3>Parameters:</h3>
+  <ul class='param'>
+    <li>
+      <span class='name'>methodOrProxy</span>
+      <span class='type'>
+        (<tt><a href='../classes/Proxy.html'>Proxy</a></tt>)
+      </span>
+      &mdash;
+      <span class='desc'>Function or Proxy; If a function is provided it will be converted to a Proxy with a &quot;this&quot; scope of this Task.</span>
     </li>
   </ul>
 </div>
   </div>
   <div class='method_details'>
     <p class='signature' id='removeInterruptHandler-instance'>
-      - (void) <strong>removeInterruptHandler</strong>(closure)
-    </p>
-    <div class='tags'>
-</div>
-  </div>
-  <div class='method_details'>
-    <p class='signature' id='withStartHandler-instance'>
-      - (void) <strong>withStartHandler</strong>(closure)
+      - (void) <strong>removeInterruptHandler</strong>(methodOrProxy)
     </p>
     <div class='docstring'>
-  <p>The provided function will be invoked each time the task is started (or re-started).
-Function can accept 0 arguments or 1 argument (the current Task)</p>
+  <p>Removes a registered Task-interrupted handler.</p>
 </div>
 <div class='tags'>
   <h3>Parameters:</h3>
   <ul class='param'>
     <li>
-      <span class='name'>closure</span>
+      <span class='name'>methodOrProxy</span>
       <span class='type'>
-        (<tt><a href='../classes/Closure.html'>Closure</a></tt>)
+        (<tt><a href='../classes/Proxy.html'>Proxy</a></tt>)
       </span>
       &mdash;
-      <span class='desc'>Function with &quot;this&quot; scope</span>
+      <span class='desc'>Function or Proxy; If a function is provided it will be converted to a Proxy with a &quot;this&quot; scope of this Task.</span>
+    </li>
+  </ul>
+</div>
+  </div>
+  <div class='method_details'>
+    <p class='signature' id='withStartHandler-instance'>
+      - (void) <strong>withStartHandler</strong>(methodOrProxy)
+    </p>
+    <div class='docstring'>
+  <p>The provided function will be invoked each time the task is started (or re-started).
+Function should accept 1 parameter of type <Task></p>
+</div>
+<div class='tags'>
+  <h3>Parameters:</h3>
+  <ul class='param'>
+    <li>
+      <span class='name'>methodOrProxy</span>
+      <span class='type'>
+        (<tt><a href='../classes/Proxy.html'>Proxy</a></tt>)
+      </span>
+      &mdash;
+      <span class='desc'>Function or Proxy; If a function is provided it will be converted to a Proxy with a &quot;this&quot; scope of this Task.</span>
     </li>
   </ul>
 </div>
   </div>
   <div class='method_details'>
     <p class='signature' id='removeStartHandler-instance'>
-      - (void) <strong>removeStartHandler</strong>(closure)
+      - (void) <strong>removeStartHandler</strong>(methodOrProxy)
     </p>
-    <div class='tags'>
+    <div class='docstring'>
+  <p>Removes a registered Task-started handler.</p>
+</div>
+<div class='tags'>
+  <h3>Parameters:</h3>
+  <ul class='param'>
+    <li>
+      <span class='name'>methodOrProxy</span>
+      <span class='type'>
+        (<tt><a href='../classes/Proxy.html'>Proxy</a></tt>)
+      </span>
+      &mdash;
+      <span class='desc'>Function or Proxy; If a function is provided it will be converted to a Proxy with a &quot;this&quot; scope of this Task.</span>
+    </li>
+  </ul>
 </div>
   </div>
   <div class='method_details'>
@@ -801,7 +871,7 @@ It triggers complete handlers and toggles the Tasks&#39;s &quot;running&quot; an
     </div>
     <div id='footer'>
   Generated on
-  Wed May 15 2013 23:43:51 GMT-0400 (EDT)
+  Thu May 16 2013 20:17:13 GMT-0400 (EDT)
   by
   <a href='https://github.com/netzpirat/codo' title='CoffeeScript API documentation generator'>Codo</a>
   v1.6.2

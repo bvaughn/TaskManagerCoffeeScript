@@ -90,7 +90,7 @@ class Task extends EventDispatcher
     @_running     = true
 
     for startHandler in @_startHandlers
-      @executeTaskStateChangeClosure( startHandler )
+      @executeTaskStateChangeProxy( startHandler )
 
     @customRun()
 
@@ -200,67 +200,107 @@ class Task extends EventDispatcher
 
   ###
   The provided function will be invoked only upon successful completion of the task.
-  Function can accept 0 arguments or 1 argument (the current Task)
-  @param closure [Closure] Function with "this" scope
+  Function should accept 1 parameter of type <Task>
+  @param methodOrProxy [Proxy]
+    Function or Proxy;
+    If a function is provided it will be converted to a Proxy with a "this" scope of this Task.
   ###
-  withCompleteHandler: (closure) ->
-    @addClosureToSet( @_completeHandlers, closure )
+  withCompleteHandler: (methodOrProxy) ->
+    @addProxyToSet( @_completeHandlers, methodOrProxy )
     return this
 
-  removeCompleteHandler: (closure) ->
-    @removeClosureFromSet( @_completeHandlers, closure )
+  ###
+  Removes a registered Task-completed handler.
+  @param methodOrProxy [Proxy]
+    Function or Proxy;
+    If a function is provided it will be converted to a Proxy with a "this" scope of this Task.
+  ###
+  removeCompleteHandler: (methodOrProxy) ->
+    @removeProxyFromSet( @_completeHandlers, methodOrProxy )
     return this
 
   ###
   The provided function will be invoked only upon failure of the task.
-  Function can accept 0 arguments or 1 argument (the current Task)
-  @param closure [Closure] Function with "this" scope
+  Function should accept 1 parameter of type <Task>
+  @param methodOrProxy [Proxy]
+    Function or Proxy;
+    If a function is provided it will be converted to a Proxy with a "this" scope of this Task.
   ###
-  withErrorHandler: (closure) ->
-    @addClosureToSet( @_errorHandlers, closure )
+  withErrorHandler: (methodOrProxy) ->
+    @addProxyToSet( @_errorHandlers, methodOrProxy )
     return this
 
-  removeErrorHandler: (closure) ->
-    @removeClosureFromSet( @_errorHandlers, closure )
+  ###
+  Removes a registered Task-errorred handler.
+  @param methodOrProxy [Proxy]
+    Function or Proxy;
+    If a function is provided it will be converted to a Proxy with a "this" scope of this Task.
+  ###
+  removeErrorHandler: (methodOrProxy) ->
+    @removeProxyFromSet( @_errorHandlers, methodOrProxy )
     return this
 
   ###
   This handler is invoked upon either success or failure of the Task.
-  Function can accept 0 arguments or 1 argument (the current Task)
-  @param closure [Closure] Function with "this" scope
+  Function should accept 1 parameter of type <Task>
+  @param methodOrProxy [Proxy]
+    Function or Proxy;
+    If a function is provided it will be converted to a Proxy with a "this" scope of this Task.
   ###
-  withFinalHandler: (closure) ->
-    @addClosureToSet( @_finalHandlers, closure )
+  withFinalHandler: (methodOrProxy) ->
+    @addProxyToSet( @_finalHandlers, methodOrProxy )
     return this
 
-  removeFinalHandler: (closure) ->
-    @removeClosureFromSet( @_finalHandlers, closure )
+  ###
+  Removes a registered final handler.
+  @param methodOrProxy [Proxy]
+    Function or Proxy;
+    If a function is provided it will be converted to a Proxy with a "this" scope of this Task.
+  ###
+  removeFinalHandler: (methodOrProxy) ->
+    @removeProxyFromSet( @_finalHandlers, methodOrProxy )
     return this
 
   ###
   The provided function will be invoked only upon interruption of the Task.
-  Function can accept 0 arguments or 1 argument (the current Task)
-  @param closure [Closure] Function with "this" scope
+  Function should accept 1 parameter of type <Task>
+  @param methodOrProxy [Proxy]
+    Function or Proxy;
+    If a function is provided it will be converted to a Proxy with a "this" scope of this Task.
   ###
-  withInterruptHandler: (closure) ->
-    @addClosureToSet( @_interruptHandlers, closure )
+  withInterruptHandler: (methodOrProxy) ->
+    @addProxyToSet( @_interruptHandlers, methodOrProxy )
     return this
 
-  removeInterruptHandler: (closure) ->
-    @removeClosureFromSet( @_interruptHandlers, closure )
+  ###
+  Removes a registered Task-interrupted handler.
+  @param methodOrProxy [Proxy]
+    Function or Proxy;
+    If a function is provided it will be converted to a Proxy with a "this" scope of this Task.
+  ###
+  removeInterruptHandler: (methodOrProxy) ->
+    @removeProxyFromSet( @_interruptHandlers, methodOrProxy )
     return this
 
   ###
   The provided function will be invoked each time the task is started (or re-started).
-  Function can accept 0 arguments or 1 argument (the current Task)
-  @param closure [Closure] Function with "this" scope
+  Function should accept 1 parameter of type <Task>
+  @param methodOrProxy [Proxy]
+    Function or Proxy;
+    If a function is provided it will be converted to a Proxy with a "this" scope of this Task.
   ###
-  withStartHandler: (closure) ->
-    @addClosureToSet( @_startHandlers, closure )
+  withStartHandler: (methodOrProxy) ->
+    @addProxyToSet( @_startHandlers, methodOrProxy )
     return this
 
-  removeStartHandler: (closure) ->
-    @removeClosureFromSet( @_startHandlers, closure )
+  ###
+  Removes a registered Task-started handler.
+  @param methodOrProxy [Proxy]
+    Function or Proxy;
+    If a function is provided it will be converted to a Proxy with a "this" scope of this Task.
+  ###
+  removeStartHandler: (methodOrProxy) ->
+    @removeProxyFromSet( @_startHandlers, methodOrProxy )
     return this
 
   ###
@@ -270,37 +310,41 @@ class Task extends EventDispatcher
   ###
 
   ###
-  Adds the specified function (or Closure) to the specified Array
+  Adds the specified function (or Proxy) to the specified Array
   @private
   ###
-  addClosureToSet: (closures, closureToAdd) ->
-    unless closureToAdd instanceof Closure
-      closureToAdd = new Closure( closureToAdd, this )
+  addProxyToSet: (proxies, methodOrProxyToAdd) ->
+    if methodOrProxyToAdd instanceof Proxy
+      proxyToAdd = methodOrProxyToAdd
+    else
+      proxyToAdd = new Proxy( methodOrProxyToAdd, this )
 
-    for closure in closures
-      if closure.equals( closureToAdd )
+    for proxy in proxies
+      if proxy.equals( proxyToAdd )
         return
 
-    closures.push( closureToAdd )
+    proxies.push( proxyToAdd )
 
   ###
-  Executes a function or a Closure (with inner function)
+  Executes a function or a Proxy (with inner function)
   @private
   ###
-  executeTaskStateChangeClosure: (closure) ->
-    closure.execute( this )
+  executeTaskStateChangeProxy: (proxy) ->
+    proxy( this )
 
   ###
-  Removes the specified function (or Closure) from the specified Array
+  Removes the specified function (or Proxy) from the specified Array
   @private
   ###
-  removeClosureFromSet: (closures, closureToRemove) ->
-    unless closureToRemove instanceof Closure
-      closureToRemove = new Closure( closureToRemove, this )
+  removeProxyFromSet: (proxies, methodOrProxyToRemove) ->
+    if methodOrProxyToRemove instanceof Proxy
+      proxyToRemove = methodOrProxyToRemove
+    else
+      proxyToRemove = new Proxy( proxyToRemove, this )
 
-    for closure, index in closures
-      if closure.equals( closureToRemove )
-        closures.splice( index, 1 )
+    for proxy, index in proxies
+      if proxy.equals( proxyToRemove )
+        proxies.splice( index, 1 )
         break
 
   ###
@@ -327,12 +371,12 @@ class Task extends EventDispatcher
     @_numTimesCompleted++;
     
     for completeHandler in @_completeHandlers
-      @executeTaskStateChangeClosure( completeHandler )
+      @executeTaskStateChangeProxy( completeHandler )
 
     @dispatchEvent( new TaskEvent( TaskEvent.COMPLETE ) )
 
     for finalHandler in @_finalHandlers
-      @executeTaskStateChangeClosure( finalHandler )
+      @executeTaskStateChangeProxy( finalHandler )
 
     @dispatchEvent( new TaskEvent( TaskEvent.FINAL ) )
 
@@ -354,11 +398,11 @@ class Task extends EventDispatcher
     @_numTimesErrored++;
 
     for errorHandler in @_errorHandlers
-      @executeTaskStateChangeClosure( errorHandler )
+      @executeTaskStateChangeProxy( errorHandler )
 
     @dispatchEvent( new TaskEvent( TaskEvent.ERROR ) )
 
     for finalHandler in @_finalHandlers
-      @executeTaskStateChangeClosure( finalHandler )
+      @executeTaskStateChangeProxy( finalHandler )
 
     @dispatchEvent( new TaskEvent( TaskEvent.FINAL ) )

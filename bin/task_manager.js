@@ -5,71 +5,70 @@ Base class for objects supporting event dispatching.
 @author [Brian Vaughn](http://www.briandavidvaughn.com), [Adrian Wiecek](http://adrianwiecek.com/2012/02/24/coffeescript-eventdispatcher/)
 */
 
-var Closure, CompositeTask, Event, EventDispatcher, Task, TaskEvent, TaskWithClosure, _ref,
+var CompositeTask, Event, EventDispatcher, Proxy, Task, TaskEvent, TaskWithClosure, _ref,
   __hasProp = {}.hasOwnProperty,
-  __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; },
-  __slice = [].slice;
+  __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; };
 
 EventDispatcher = (function() {
   /*
   @private
   */
   function EventDispatcher() {
-    this.closures = {};
+    this.proxies = {};
   }
 
   /*
-  Registers callback for specified eventType.
+  Registers method for specified eventType.
   @param eventType [String] Event type / name
-  @param callback [Function] Function accepting 1 parameter of type `Event`
+  @param method [Function] Function accepting 1 parameter of type `Event`
   @param thisScope [Object] The *this* scope to apply to the callback method
   */
 
 
-  EventDispatcher.prototype.addEventListener = function(eventType, callback, thisScope) {
-    var closure, newClosure, _i, _len, _ref;
+  EventDispatcher.prototype.addEventListener = function(eventType, method, thisScope) {
+    var newProxy, proxy, _i, _len, _ref;
 
-    if (!this.closures) {
-      this.closures = {};
+    if (!this.proxies) {
+      this.proxies = {};
     }
-    if (!this.closures[eventType]) {
-      this.closures[eventType] = [];
+    if (!this.proxies[eventType]) {
+      this.proxies[eventType] = [];
     }
-    newClosure = new Closure(callback, thisScope);
-    _ref = this.closures;
+    newProxy = new Proxy(method, thisScope);
+    _ref = this.proxies;
     for (_i = 0, _len = _ref.length; _i < _len; _i++) {
-      closure = _ref[_i];
-      if (closure.equals(newClosure)) {
+      proxy = _ref[_i];
+      if (proxy.equals(newProxy)) {
         return;
       }
     }
-    return this.closures[eventType].push(newClosure);
+    return this.proxies[eventType].push(newProxy);
   };
 
   /*
-  Removes registered callback for specified eventType.
+  Removes registered method for specified eventType.
   @param eventType [String] Event type / name
-  @param callback [Function] Function
+  @param method [Function] Function
   @param thisScope [Object] The *this* scope to apply to the callback method
   */
 
 
-  EventDispatcher.prototype.removeEventListener = function(eventType, callback, thisScope) {
-    var closure, index, newClosure, _i, _len, _ref, _results;
+  EventDispatcher.prototype.removeEventListener = function(eventType, method, thisScope) {
+    var index, newProxy, proxy, _i, _len, _ref, _results;
 
-    if (!this.closures) {
-      this.closures = {};
+    if (!this.proxies) {
+      this.proxies = {};
     }
     if (!this.hasEventListeners(eventType)) {
       return;
     }
-    newClosure = new Closure(callback, thisScope);
-    _ref = this.closures;
+    newProxy = new Proxy(method, thisScope);
+    _ref = this.proxies;
     _results = [];
     for (index = _i = 0, _len = _ref.length; _i < _len; index = ++_i) {
-      closure = _ref[index];
-      if (closure.equals(newClosure)) {
-        this.closures.splice(index, 1);
+      proxy = _ref[index];
+      if (proxy.equals(newProxy)) {
+        this.proxies.splice(index, 1);
         break;
       } else {
         _results.push(void 0);
@@ -79,50 +78,50 @@ EventDispatcher = (function() {
   };
 
   /*
-  Invokes all registered callbacks for specified event.
+  Invokes all registered methods for specified event.
   @param event [Event] Event to dispatch
   */
 
 
   EventDispatcher.prototype.dispatchEvent = function(event) {
-    var closure, _i, _len, _ref, _results;
+    var proxy, _i, _len, _ref, _results;
 
-    if (!this.closures) {
-      this.closures = {};
+    if (!this.proxies) {
+      this.proxies = {};
     }
     if (!this.hasEventListeners(event.eventType)) {
       return;
     }
     event.target = this;
-    _ref = this.closures[event.eventType];
+    _ref = this.proxies[event.eventType];
     _results = [];
     for (_i = 0, _len = _ref.length; _i < _len; _i++) {
-      closure = _ref[_i];
-      _results.push(closure.execute(event));
+      proxy = _ref[_i];
+      _results.push(proxy(event));
     }
     return _results;
   };
 
   /*
-  Returns true if there are any callbacks registered for specified eventType.
+  Returns true if there are any methods registered for specified eventType.
   @param eventType [String] Event type / name
   */
 
 
   EventDispatcher.prototype.hasEventListeners = function(eventType) {
-    if (!this.closures) {
-      this.closures = {};
+    if (!this.proxies) {
+      this.proxies = {};
     }
-    return this.closures[eventType] && this.closures[eventType].length > 0;
+    return this.proxies[eventType] && this.proxies[eventType].length > 0;
   };
 
   /*
-  Removes all registered callbacks.
+  Removes all registered methods.
   */
 
 
   EventDispatcher.prototype.removeAllEventListeners = function() {
-    return this.closures = {};
+    return this.proxies = {};
   };
 
   return EventDispatcher;
@@ -246,7 +245,7 @@ Task = (function(_super) {
     _ref = this._startHandlers;
     for (_i = 0, _len = _ref.length; _i < _len; _i++) {
       startHandler = _ref[_i];
-      this.executeTaskStateChangeClosure(startHandler);
+      this.executeTaskStateChangeProxy(startHandler);
     }
     this.customRun();
     return this;
@@ -423,86 +422,136 @@ Task = (function(_super) {
 
   /*
   The provided function will be invoked only upon successful completion of the task.
-  Function can accept 0 arguments or 1 argument (the current Task)
-  @param closure [Closure] Function with "this" scope
+  Function should accept 1 parameter of type <Task>
+  @param methodOrProxy [Proxy]
+    Function or Proxy;
+    If a function is provided it will be converted to a Proxy with a "this" scope of this Task.
   */
 
 
-  Task.prototype.withCompleteHandler = function(closure) {
-    this.addClosureToSet(this._completeHandlers, closure);
+  Task.prototype.withCompleteHandler = function(methodOrProxy) {
+    this.addProxyToSet(this._completeHandlers, methodOrProxy);
     return this;
   };
 
-  Task.prototype.removeCompleteHandler = function(closure) {
-    this.removeClosureFromSet(this._completeHandlers, closure);
+  /*
+  Removes a registered Task-completed handler.
+  @param methodOrProxy [Proxy]
+    Function or Proxy;
+    If a function is provided it will be converted to a Proxy with a "this" scope of this Task.
+  */
+
+
+  Task.prototype.removeCompleteHandler = function(methodOrProxy) {
+    this.removeProxyFromSet(this._completeHandlers, methodOrProxy);
     return this;
   };
 
   /*
   The provided function will be invoked only upon failure of the task.
-  Function can accept 0 arguments or 1 argument (the current Task)
-  @param closure [Closure] Function with "this" scope
+  Function should accept 1 parameter of type <Task>
+  @param methodOrProxy [Proxy]
+    Function or Proxy;
+    If a function is provided it will be converted to a Proxy with a "this" scope of this Task.
   */
 
 
-  Task.prototype.withErrorHandler = function(closure) {
-    this.addClosureToSet(this._errorHandlers, closure);
+  Task.prototype.withErrorHandler = function(methodOrProxy) {
+    this.addProxyToSet(this._errorHandlers, methodOrProxy);
     return this;
   };
 
-  Task.prototype.removeErrorHandler = function(closure) {
-    this.removeClosureFromSet(this._errorHandlers, closure);
+  /*
+  Removes a registered Task-errorred handler.
+  @param methodOrProxy [Proxy]
+    Function or Proxy;
+    If a function is provided it will be converted to a Proxy with a "this" scope of this Task.
+  */
+
+
+  Task.prototype.removeErrorHandler = function(methodOrProxy) {
+    this.removeProxyFromSet(this._errorHandlers, methodOrProxy);
     return this;
   };
 
   /*
   This handler is invoked upon either success or failure of the Task.
-  Function can accept 0 arguments or 1 argument (the current Task)
-  @param closure [Closure] Function with "this" scope
+  Function should accept 1 parameter of type <Task>
+  @param methodOrProxy [Proxy]
+    Function or Proxy;
+    If a function is provided it will be converted to a Proxy with a "this" scope of this Task.
   */
 
 
-  Task.prototype.withFinalHandler = function(closure) {
-    this.addClosureToSet(this._finalHandlers, closure);
+  Task.prototype.withFinalHandler = function(methodOrProxy) {
+    this.addProxyToSet(this._finalHandlers, methodOrProxy);
     return this;
   };
 
-  Task.prototype.removeFinalHandler = function(closure) {
-    this.removeClosureFromSet(this._finalHandlers, closure);
+  /*
+  Removes a registered final handler.
+  @param methodOrProxy [Proxy]
+    Function or Proxy;
+    If a function is provided it will be converted to a Proxy with a "this" scope of this Task.
+  */
+
+
+  Task.prototype.removeFinalHandler = function(methodOrProxy) {
+    this.removeProxyFromSet(this._finalHandlers, methodOrProxy);
     return this;
   };
 
   /*
   The provided function will be invoked only upon interruption of the Task.
-  Function can accept 0 arguments or 1 argument (the current Task)
-  @param closure [Closure] Function with "this" scope
+  Function should accept 1 parameter of type <Task>
+  @param methodOrProxy [Proxy]
+    Function or Proxy;
+    If a function is provided it will be converted to a Proxy with a "this" scope of this Task.
   */
 
 
-  Task.prototype.withInterruptHandler = function(closure) {
-    this.addClosureToSet(this._interruptHandlers, closure);
+  Task.prototype.withInterruptHandler = function(methodOrProxy) {
+    this.addProxyToSet(this._interruptHandlers, methodOrProxy);
     return this;
   };
 
-  Task.prototype.removeInterruptHandler = function(closure) {
-    this.removeClosureFromSet(this._interruptHandlers, closure);
+  /*
+  Removes a registered Task-interrupted handler.
+  @param methodOrProxy [Proxy]
+    Function or Proxy;
+    If a function is provided it will be converted to a Proxy with a "this" scope of this Task.
+  */
+
+
+  Task.prototype.removeInterruptHandler = function(methodOrProxy) {
+    this.removeProxyFromSet(this._interruptHandlers, methodOrProxy);
     return this;
   };
 
   /*
   The provided function will be invoked each time the task is started (or re-started).
-  Function can accept 0 arguments or 1 argument (the current Task)
-  @param closure [Closure] Function with "this" scope
+  Function should accept 1 parameter of type <Task>
+  @param methodOrProxy [Proxy]
+    Function or Proxy;
+    If a function is provided it will be converted to a Proxy with a "this" scope of this Task.
   */
 
 
-  Task.prototype.withStartHandler = function(closure) {
-    this.addClosureToSet(this._startHandlers, closure);
+  Task.prototype.withStartHandler = function(methodOrProxy) {
+    this.addProxyToSet(this._startHandlers, methodOrProxy);
     return this;
   };
 
-  Task.prototype.removeStartHandler = function(closure) {
-    this.removeClosureFromSet(this._startHandlers, closure);
+  /*
+  Removes a registered Task-started handler.
+  @param methodOrProxy [Proxy]
+    Function or Proxy;
+    If a function is provided it will be converted to a Proxy with a "this" scope of this Task.
+  */
+
+
+  Task.prototype.removeStartHandler = function(methodOrProxy) {
+    this.removeProxyFromSet(this._startHandlers, methodOrProxy);
     return this;
   };
 
@@ -514,53 +563,57 @@ Task = (function(_super) {
 
 
   /*
-  Adds the specified function (or Closure) to the specified Array
+  Adds the specified function (or Proxy) to the specified Array
   @private
   */
 
 
-  Task.prototype.addClosureToSet = function(closures, closureToAdd) {
-    var closure, _i, _len;
+  Task.prototype.addProxyToSet = function(proxies, methodOrProxyToAdd) {
+    var proxy, proxyToAdd, _i, _len;
 
-    if (!(closureToAdd instanceof Closure)) {
-      closureToAdd = new Closure(closureToAdd, this);
+    if (methodOrProxyToAdd instanceof Proxy) {
+      proxyToAdd = methodOrProxyToAdd;
+    } else {
+      proxyToAdd = new Proxy(methodOrProxyToAdd, this);
     }
-    for (_i = 0, _len = closures.length; _i < _len; _i++) {
-      closure = closures[_i];
-      if (closure.equals(closureToAdd)) {
+    for (_i = 0, _len = proxies.length; _i < _len; _i++) {
+      proxy = proxies[_i];
+      if (proxy.equals(proxyToAdd)) {
         return;
       }
     }
-    return closures.push(closureToAdd);
+    return proxies.push(proxyToAdd);
   };
 
   /*
-  Executes a function or a Closure (with inner function)
+  Executes a function or a Proxy (with inner function)
   @private
   */
 
 
-  Task.prototype.executeTaskStateChangeClosure = function(closure) {
-    return closure.execute(this);
+  Task.prototype.executeTaskStateChangeProxy = function(proxy) {
+    return proxy(this);
   };
 
   /*
-  Removes the specified function (or Closure) from the specified Array
+  Removes the specified function (or Proxy) from the specified Array
   @private
   */
 
 
-  Task.prototype.removeClosureFromSet = function(closures, closureToRemove) {
-    var closure, index, _i, _len, _results;
+  Task.prototype.removeProxyFromSet = function(proxies, methodOrProxyToRemove) {
+    var index, proxy, proxyToRemove, _i, _len, _results;
 
-    if (!(closureToRemove instanceof Closure)) {
-      closureToRemove = new Closure(closureToRemove, this);
+    if (methodOrProxyToRemove instanceof Proxy) {
+      proxyToRemove = methodOrProxyToRemove;
+    } else {
+      proxyToRemove = new Proxy(proxyToRemove, this);
     }
     _results = [];
-    for (index = _i = 0, _len = closures.length; _i < _len; index = ++_i) {
-      closure = closures[index];
-      if (closure.equals(closureToRemove)) {
-        closures.splice(index, 1);
+    for (index = _i = 0, _len = proxies.length; _i < _len; index = ++_i) {
+      proxy = proxies[index];
+      if (proxy.equals(proxyToRemove)) {
+        proxies.splice(index, 1);
         break;
       } else {
         _results.push(void 0);
@@ -598,13 +651,13 @@ Task = (function(_super) {
     _ref = this._completeHandlers;
     for (_i = 0, _len = _ref.length; _i < _len; _i++) {
       completeHandler = _ref[_i];
-      this.executeTaskStateChangeClosure(completeHandler);
+      this.executeTaskStateChangeProxy(completeHandler);
     }
     this.dispatchEvent(new TaskEvent(TaskEvent.COMPLETE));
     _ref1 = this._finalHandlers;
     for (_j = 0, _len1 = _ref1.length; _j < _len1; _j++) {
       finalHandler = _ref1[_j];
-      this.executeTaskStateChangeClosure(finalHandler);
+      this.executeTaskStateChangeProxy(finalHandler);
     }
     return this.dispatchEvent(new TaskEvent(TaskEvent.FINAL));
   };
@@ -631,13 +684,13 @@ Task = (function(_super) {
     _ref = this._errorHandlers;
     for (_i = 0, _len = _ref.length; _i < _len; _i++) {
       errorHandler = _ref[_i];
-      this.executeTaskStateChangeClosure(errorHandler);
+      this.executeTaskStateChangeProxy(errorHandler);
     }
     this.dispatchEvent(new TaskEvent(TaskEvent.ERROR));
     _ref1 = this._finalHandlers;
     for (_j = 0, _len1 = _ref1.length; _j < _len1; _j++) {
       finalHandler = _ref1[_j];
-      this.executeTaskStateChangeClosure(finalHandler);
+      this.executeTaskStateChangeProxy(finalHandler);
     }
     return this.dispatchEvent(new TaskEvent(TaskEvent.FINAL));
   };
@@ -834,6 +887,108 @@ TaskEvent = (function(_super) {
 }).call(this, Event);
 
 /*
+Encapsulates a function and its scope, enabling the function to be later executed within the desired scope.
+
+@method #equals(key, value)
+  Compares the current function and scope to those contained in another Proxy.
+  @param otherProxy [Proxy] Proxy to compare this one to
+  @return [Boolean] Whether or not the two Proxy objects point to the same function and scope
+
+@author [Brian Vaughn](http://www.briandavidvaughn.com)
+*/
+
+
+Proxy = (function() {
+  var get, set,
+    _this = this;
+
+  get = function(props) {
+    var getter, name, _results;
+
+    _results = [];
+    for (name in props) {
+      getter = props[name];
+      _results.push(Proxy.prototype.__defineGetter__(name, getter));
+    }
+    return _results;
+  };
+
+  set = function(props) {
+    var name, setter, _results;
+
+    _results = [];
+    for (name in props) {
+      setter = props[name];
+      _results.push(Proxy.prototype.__defineSetter__(name, setter));
+    }
+    return _results;
+  };
+
+  /*
+  Constructor.
+  @param closure [Function] A function
+  @param thisScope [Object] Optional "this" scope to apply to the function
+  */
+
+
+  function Proxy(closure, thisScope) {
+    var InnerProxy, that;
+
+    this.closure = closure;
+    this.thisScope = thisScope;
+    that = this;
+    /*
+    @private
+    */
+
+    InnerProxy = (function() {
+      function InnerProxy() {
+        this.closure = that.closure;
+        this.thisScope = that.thisScope;
+        return this.closure.apply(this.thisScope, arguments);
+      }
+
+      return InnerProxy;
+
+    })();
+    InnerProxy.closure = this.closure;
+    InnerProxy.thisScope = this.thisScope;
+    InnerProxy.equals = function( otherProxy ) {
+        return that.thisScope == otherProxy.thisScope &&
+               that.closure   == otherProxy.closure;
+      };
+    return InnerProxy;
+  }
+
+  get({
+    closure: function() {
+      return this._closure;
+    }
+  });
+
+  set({
+    closure: function(_closure) {
+      this._closure = _closure;
+    }
+  });
+
+  get({
+    thisScope: function() {
+      return this._thisScope;
+    }
+  });
+
+  set({
+    thisScope: function(_thisScope) {
+      this._thisScope = _thisScope;
+    }
+  });
+
+  return Proxy;
+
+}).call(this);
+
+/*
 Wraps a set of ITasks and executes them in parallel or serial, as specified by a boolean constructor arg.
 
 @author [Brian Vaughn](http://www.briandavidvaughn.com)
@@ -991,9 +1146,9 @@ CompositeTask = (function(_super) {
 
 
   CompositeTask.prototype.addTaskEventListeners = function(task) {
-    task.withCompleteHandler(new Closure(this._individualTaskCompleted, this));
-    task.withErrorHandler(new Closure(this._individualTaskCompleteded, this));
-    return task.withStartHandler(new Closure(this._individualTaskStarted, this));
+    task.withCompleteHandler(new Proxy(this._individualTaskCompleted, this));
+    task.withErrorHandler(new Proxy(this._individualTaskCompleteded, this));
+    return task.withStartHandler(new Proxy(this._individualTaskStarted, this));
   };
 
   CompositeTask.prototype.checkForTaskCompletion = function() {
@@ -1031,9 +1186,9 @@ CompositeTask = (function(_super) {
   };
 
   CompositeTask.prototype.removeTaskEventListeners = function(task) {
-    task.removeCompleteHandler(new Closure(this._individualTaskCompleted, this));
-    task.removeErrorHandler(new Closure(this._individualTaskCompleteded, this));
-    return task.removeStartHandler(new Closure(this._individualTaskStarted, this));
+    task.removeCompleteHandler(new Proxy(this._individualTaskCompleted, this));
+    task.removeErrorHandler(new Proxy(this._individualTaskCompleteded, this));
+    return task.removeStartHandler(new Proxy(this._individualTaskStarted, this));
   };
 
   /*
@@ -1063,50 +1218,3 @@ CompositeTask = (function(_super) {
   return CompositeTask;
 
 }).call(this, Task);
-
-/*
-Encapsulates a function and its scope, enabling the function to be later executed within the desired scope.
-
-@author [Brian Vaughn](http://www.briandavidvaughn.com)
-*/
-
-
-Closure = (function() {
-  /*
-  Executes the inner function with the scope specified.
-  @param @closure [Function] A function
-  @param @scope [Object] The "this" scope to apply to the function
-  */
-  function Closure(closure, scope) {
-    this.closure = closure;
-    this.scope = scope;
-  }
-
-  /*
-  Executes the inner function with the scope specified.
-  Any parameters passed to this method will be passed along to the inner function.
-  @return [*] The return value of this Closure's inner function
-  */
-
-
-  Closure.prototype.execute = function() {
-    var args;
-
-    args = 1 <= arguments.length ? __slice.call(arguments, 0) : [];
-    return this.closure.apply(this.scope, arguments);
-  };
-
-  /*
-  Compares the current function and scope to those contained in another Closure.
-  @param otherClosure [Closure] Closure to compare this one to
-  @return [Boolean] Whether or not the two Closures point to the same function and scope
-  */
-
-
-  Closure.prototype.equals = function(otherClosure) {
-    return this.closure === otherClosure.closure && this.scope === otherClosure.scope;
-  };
-
-  return Closure;
-
-})();

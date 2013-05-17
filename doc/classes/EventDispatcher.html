@@ -133,63 +133,63 @@
       <ul class='summary'>
   <li>
     <span class='signature'>
-      <a href='#addListener-instance'>
-        - (void) <strong>addListener</strong>(eventType, callback, thisScope)
+      <a href='#addEventListener-instance'>
+        - (void) <strong>addEventListener</strong>(eventType, method, thisScope)
       </a>
     </span>
     <span class='desc'>
-      Registers callback for specified eventType.
+      Registers method for specified eventType.
     </span>
   </li>
   <li>
     <span class='signature'>
-      <a href='#removeListener-instance'>
-        - (void) <strong>removeListener</strong>(eventType, callback, thisScope)
+      <a href='#removeEventListener-instance'>
+        - (void) <strong>removeEventListener</strong>(eventType, method, thisScope)
       </a>
     </span>
     <span class='desc'>
-      Removes registered callback for specified eventType.
+      Removes registered method for specified eventType.
     </span>
   </li>
   <li>
     <span class='signature'>
-      <a href='#dispatch-instance'>
-        - (void) <strong>dispatch</strong>(event)
+      <a href='#dispatchEvent-instance'>
+        - (void) <strong>dispatchEvent</strong>(event)
       </a>
     </span>
     <span class='desc'>
-      Invokes all registered callbacks for specified event.
+      Invokes all registered methods for specified event.
     </span>
   </li>
   <li>
     <span class='signature'>
-      <a href='#hasListeners-instance'>
-        - (void) <strong>hasListeners</strong>(eventType)
+      <a href='#hasEventListeners-instance'>
+        - (void) <strong>hasEventListeners</strong>(eventType)
       </a>
     </span>
     <span class='desc'>
-      Returns true if there are any callbacks registered for specified eventType.
+      Returns true if there are any methods registered for specified eventType.
     </span>
   </li>
   <li>
     <span class='signature'>
-      <a href='#removeAllListeners-instance'>
-        - (void) <strong>removeAllListeners</strong>()
+      <a href='#removeAllEventListeners-instance'>
+        - (void) <strong>removeAllEventListeners</strong>()
       </a>
     </span>
     <span class='desc'>
-      Removes all registered callbacks.
+      Removes all registered methods.
     </span>
   </li>
 </ul>
       <h2>Instance Method Details</h2>
       <div class='methods'>
   <div class='method_details'>
-    <p class='signature' id='addListener-instance'>
-      - (void) <strong>addListener</strong>(eventType, callback, thisScope)
+    <p class='signature' id='addEventListener-instance'>
+      - (void) <strong>addEventListener</strong>(eventType, method, thisScope)
     </p>
     <div class='docstring'>
-  <p>Registers callback for specified eventType.</p>
+  <p>Registers method for specified eventType.</p>
 </div>
 <div class='tags'>
   <h3>Parameters:</h3>
@@ -203,7 +203,7 @@
       <span class='desc'>Event type / name</span>
     </li>
     <li>
-      <span class='name'>callback</span>
+      <span class='name'>method</span>
       <span class='type'>
         (<tt>Function</tt>)
       </span>
@@ -222,11 +222,11 @@
 </div>
   </div>
   <div class='method_details'>
-    <p class='signature' id='removeListener-instance'>
-      - (void) <strong>removeListener</strong>(eventType, callback, thisScope)
+    <p class='signature' id='removeEventListener-instance'>
+      - (void) <strong>removeEventListener</strong>(eventType, method, thisScope)
     </p>
     <div class='docstring'>
-  <p>Removes registered callback for specified eventType.</p>
+  <p>Removes registered method for specified eventType.</p>
 </div>
 <div class='tags'>
   <h3>Parameters:</h3>
@@ -240,7 +240,7 @@
       <span class='desc'>Event type / name</span>
     </li>
     <li>
-      <span class='name'>callback</span>
+      <span class='name'>method</span>
       <span class='type'>
         (<tt>Function</tt>)
       </span>
@@ -259,11 +259,11 @@
 </div>
   </div>
   <div class='method_details'>
-    <p class='signature' id='dispatch-instance'>
-      - (void) <strong>dispatch</strong>(event)
+    <p class='signature' id='dispatchEvent-instance'>
+      - (void) <strong>dispatchEvent</strong>(event)
     </p>
     <div class='docstring'>
-  <p>Invokes all registered callbacks for specified event.</p>
+  <p>Invokes all registered methods for specified event.</p>
 </div>
 <div class='tags'>
   <h3>Parameters:</h3>
@@ -280,11 +280,11 @@
 </div>
   </div>
   <div class='method_details'>
-    <p class='signature' id='hasListeners-instance'>
-      - (void) <strong>hasListeners</strong>(eventType)
+    <p class='signature' id='hasEventListeners-instance'>
+      - (void) <strong>hasEventListeners</strong>(eventType)
     </p>
     <div class='docstring'>
-  <p>Returns true if there are any callbacks registered for specified eventType.</p>
+  <p>Returns true if there are any methods registered for specified eventType.</p>
 </div>
 <div class='tags'>
   <h3>Parameters:</h3>
@@ -301,11 +301,11 @@
 </div>
   </div>
   <div class='method_details'>
-    <p class='signature' id='removeAllListeners-instance'>
-      - (void) <strong>removeAllListeners</strong>()
+    <p class='signature' id='removeAllEventListeners-instance'>
+      - (void) <strong>removeAllEventListeners</strong>()
     </p>
     <div class='docstring'>
-  <p>Removes all registered callbacks.</p>
+  <p>Removes all registered methods.</p>
 </div>
 <div class='tags'>
 </div>
@@ -314,7 +314,7 @@
     </div>
     <div id='footer'>
   Generated on
-  Wed May 15 2013 23:43:51 GMT-0400 (EDT)
+  Thu May 16 2013 20:17:13 GMT-0400 (EDT)
   by
   <a href='https://github.com/netzpirat/codo' title='CoffeeScript API documentation generator'>Codo</a>
   v1.6.2

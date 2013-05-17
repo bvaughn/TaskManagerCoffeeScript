@@ -94,9 +94,9 @@ class CompositeTask extends Task
 
   # @private
   addTaskEventListeners: (task) ->
-    task.withCompleteHandler( new Closure( @_individualTaskCompleted, this ) )
-    task.withErrorHandler( new Closure( @_individualTaskCompleteded, this ) )
-    task.withStartHandler( new Closure( @_individualTaskStarted, this ) )
+    task.withCompleteHandler( new Proxy( @_individualTaskCompleted, this ) )
+    task.withErrorHandler( new Proxy( @_individualTaskCompleteded, this ) )
+    task.withStartHandler( new Proxy( @_individualTaskStarted, this ) )
 
   # @private
   checkForTaskCompletion: ->
@@ -135,9 +135,9 @@ class CompositeTask extends Task
 
   # @private
   removeTaskEventListeners: (task) ->
-    task.removeCompleteHandler( new Closure( @_individualTaskCompleted, this ) )
-    task.removeErrorHandler( new Closure( @_individualTaskCompleteded, this ) )
-    task.removeStartHandler( new Closure( @_individualTaskStarted, this ) )
+    task.removeCompleteHandler( new Proxy( @_individualTaskCompleted, this ) )
+    task.removeErrorHandler( new Proxy( @_individualTaskCompleteded, this ) )
+    task.removeStartHandler( new Proxy( @_individualTaskStarted, this ) )
 
   ###
   Individual Task event handlers

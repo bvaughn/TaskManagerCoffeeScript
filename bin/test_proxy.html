@@ -1,0 +1,34 @@
+<html>
+<head>
+</head>
+<body>
+	<script type="text/javascript" src="task_manager.js"></script>
+	<script type="text/javascript">
+		function testProxy() {
+			console.clear();
+		
+			var thisScopeA = [ 1, 2, 3 ];
+			var thisScopeB = "foobar";
+			var functionA = function() { console.log( "Function A, this = " + this ); };
+			var functionB = function( string ) { console.log( "Function B, this = " + this + ", string = " + string ); };
+
+			var proxyAA  = new Proxy( functionA, thisScopeA );
+			var proxyBB  = new Proxy( functionB, thisScopeB );
+			var proxyAB  = new Proxy( functionA, thisScopeB );
+			var proxyAA2 = new Proxy( functionA, thisScopeA );
+		
+			console.log( "proxyAA.closure = " + proxyAA.closure );
+			console.log( "proxyAA.thisScope = " + proxyAA.thisScope );
+		
+			proxyAA();
+			proxyBB( "foobar" );
+			proxyAB();
+		
+			console.log( "AA == BB ? " + ( proxyAA.equals( proxyBB ) ) );
+			console.log( "AA == AA2 ? " + ( proxyAA.equals( proxyAA2 ) ) );
+		}
+	</script>
+	
+	<button onclick="testProxy()">Test Proxy</button>
+</body>
+</html>
