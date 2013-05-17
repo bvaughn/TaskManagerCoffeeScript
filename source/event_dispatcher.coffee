@@ -1,7 +1,10 @@
 ###
-Base class for objects supporting event dispatching.
+Dispatches `Event` objects and notifies exeternal listeners.
+Extend this object to dispatch events to external listeners.
 
-@author [Brian Vaughn](http://www.briandavidvaughn.com), [Adrian Wiecek](http://adrianwiecek.com/2012/02/24/coffeescript-eventdispatcher/)
+Special thanks to [Adrian Wiecek](http://adrianwiecek.com/2012/02/24/coffeescript-eventdispatcher/) for the initial idea.
+
+@author [Brian Vaughn](http://www.briandavidvaughn.com)
 ###
 class EventDispatcher
 
@@ -10,65 +13,65 @@ class EventDispatcher
   ###
   constructor: ->
     @proxies = {}
- 
+
   ###
-  Registers method for specified eventType.
-  @param eventType [String] Event type / name
+  Registers a listener for specified type of `Event`.
+  @param eventType [String] `Event` type
   @param method [Function] Function accepting 1 parameter of type `Event`
-  @param thisScope [Object] The *this* scope to apply to the callback method
   ###
-  addEventListener: (eventType, method, thisScope) ->
+  addEventListener: ( eventType, method ) ->
     unless @proxies
       @proxies = {}
 
     unless @proxies[eventType]
       @proxies[eventType] = []
 
-    newProxy = new Proxy( method, thisScope )
+    unless method instanceof Proxy
+      method = new Proxy( method, this )
     
     for proxy in @proxies
-      if proxy.equals( newProxy )
+      if proxy.equals( method )
         return
 
-    @proxies[eventType].push( newProxy )
+    @proxies[eventType].push( method )
   
   ###
   Removes registered method for specified eventType.
-  @param eventType [String] Event type / name
-  @param method [Function] Function
-  @param thisScope [Object] The *this* scope to apply to the callback method
+  @param eventType [String] `Event` type
+  @param method [Function] Function accepting 1 parameter of type `Event`
   ###
-  removeEventListener: (eventType, method, thisScope) ->
+  removeEventListener: ( eventType, method ) ->
     unless @proxies
       @proxies = {}
 
     return unless @hasEventListeners( eventType )
 
-    newProxy = new Proxy( method, thisScope )
+    unless method instanceof Proxy
+      method = new Proxy( method, this )
 
     for proxy, index in @proxies
-      if proxy.equals( newProxy )
+      if proxy.equals( method )
         @proxies.splice( index, 1 )
         break
  
   ###
-  Invokes all registered methods for specified event.
-  @param event [Event] Event to dispatch
+  Dispatches the specified `Event` and notifies all listeners.
+  @param event [Event] `Event` to dispatch
   ###
   dispatchEvent: (event) ->
     unless @proxies
       @proxies = {}
 
-    return unless @hasEventListeners( event.eventType )
+    return unless @hasEventListeners( event.type )
 
-    event.target = this
+    event.dispatcher = this
 
-    for proxy in @proxies[ event.eventType ]
+    for proxy in @proxies[ event.type ]
       proxy( event )
  
   ###
-  Returns true if there are any methods registered for specified eventType.
-  @param eventType [String] Event type / name
+  Returns true if there are any methods registered for specified `Event` type.
+  @param eventType [String] `Event` type
   ###
   hasEventListeners: (eventType) ->
     unless @proxies
@@ -77,7 +80,7 @@ class EventDispatcher
     @proxies[ eventType ] and @proxies[ eventType ].length > 0
  
   ###
-  Removes all registered methods.
+  Removes all event listeners.
   ###
   removeAllEventListeners: ->
     @proxies = {}

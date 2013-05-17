@@ -1,0 +1,39 @@
+<html>
+<head>
+</head>
+<body>
+	<!--<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js" ></script>-->
+	<!--<script type="text/javascript" src="proxy.js"></script>-->
+	<script type="text/javascript" src="task_manager.js"></script>
+	<script type="text/javascript">
+		function eventHandler( event ) {
+			console.log( "Event handler invoked for:" );
+			console.log( " - dispatcher: " + event.dispatcher );
+			console.log( " - type: " + event.type );
+		}
+		
+		var eventType = "FOOBAR";
+		
+		var eventDispatcher = new EventDispatcher();
+		eventDispatcher.addEventListener( eventType, eventHandler );
+		
+		function dispatchFoobarEvent() {
+			console.clear();
+			
+			console.log( "Checking for listeners..." );
+			
+			if ( eventDispatcher.hasEventListeners( eventType ) ) {
+				console.log( " - Check!" );
+			} else {
+				console.log( " - None found" );
+			}
+			
+			console.log( "Dispatching Event..." );
+			
+			eventDispatcher.dispatchEvent( new Event( eventType ) );
+		}
+	</script>
+	
+	<button onclick="dispatchFoobarEvent()">Dispatch Event</button>
+</body>
+</html>

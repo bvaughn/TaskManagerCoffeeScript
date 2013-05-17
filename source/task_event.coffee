@@ -34,4 +34,4 @@ class TaskEvent extends Event
   @INTERRUPTED: "TaskEvent.INTERRUPTED"
 
   # @property [Task] The Task this event is describing
-  get task: -> @target
+  get task: -> @dispatcher

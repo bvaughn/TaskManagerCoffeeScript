@@ -115,13 +115,14 @@
       </table>
       <h2>Overview</h2>
       <div class='docstring'>
-  <p>Base class for objects supporting event dispatching.</p>
+  <p>Dispatches <code>Event</code> objects and notifies exeternal listeners.
+Extend this object to dispatch events to external listeners.</p><p>Special thanks to <a href="http://adrianwiecek.com/2012/02/24/coffeescript-eventdispatcher/">Adrian Wiecek</a> for the initial idea.</p>
 </div>
 <div class='tags'>
   <h3>Author:</h3>
   <ul class='author'>
     <li>
-      <a href="http://www.briandavidvaughn.com">Brian Vaughn</a>, <a href="http://adrianwiecek.com/2012/02/24/coffeescript-eventdispatcher/">Adrian Wiecek</a>
+      <a href="http://www.briandavidvaughn.com">Brian Vaughn</a>
     </li>
   </ul>
 </div>
@@ -134,17 +135,17 @@
   <li>
     <span class='signature'>
       <a href='#addEventListener-instance'>
-        - (void) <strong>addEventListener</strong>(eventType, method, thisScope)
+        - (void) <strong>addEventListener</strong>(eventType, method)
       </a>
     </span>
     <span class='desc'>
-      Registers method for specified eventType.
+      Registers a listener for specified type of <code>Event</code>.
     </span>
   </li>
   <li>
     <span class='signature'>
       <a href='#removeEventListener-instance'>
-        - (void) <strong>removeEventListener</strong>(eventType, method, thisScope)
+        - (void) <strong>removeEventListener</strong>(eventType, method)
       </a>
     </span>
     <span class='desc'>
@@ -158,7 +159,7 @@
       </a>
     </span>
     <span class='desc'>
-      Invokes all registered methods for specified event.
+      Dispatches the specified <code>Event</code> and notifies all listeners.
     </span>
   </li>
   <li>
@@ -168,7 +169,7 @@
       </a>
     </span>
     <span class='desc'>
-      Returns true if there are any methods registered for specified eventType.
+      Returns true if there are any methods registered for specified <code>Event</code> type.
     </span>
   </li>
   <li>
@@ -178,7 +179,7 @@
       </a>
     </span>
     <span class='desc'>
-      Removes all registered methods.
+      Removes all event listeners.
     </span>
   </li>
 </ul>
@@ -186,10 +187,10 @@
       <div class='methods'>
   <div class='method_details'>
     <p class='signature' id='addEventListener-instance'>
-      - (void) <strong>addEventListener</strong>(eventType, method, thisScope)
+      - (void) <strong>addEventListener</strong>(eventType, method)
     </p>
     <div class='docstring'>
-  <p>Registers method for specified eventType.</p>
+  <p>Registers a listener for specified type of <code>Event</code>.</p>
 </div>
 <div class='tags'>
   <h3>Parameters:</h3>
@@ -200,7 +201,7 @@
         (<tt>String</tt>)
       </span>
       &mdash;
-      <span class='desc'>Event type / name</span>
+      <span class='desc'><code>Event</code> type</span>
     </li>
     <li>
       <span class='name'>method</span>
@@ -210,20 +211,12 @@
       &mdash;
       <span class='desc'>Function accepting 1 parameter of type <code>Event</code></span>
     </li>
-    <li>
-      <span class='name'>thisScope</span>
-      <span class='type'>
-        (<tt>Object</tt>)
-      </span>
-      &mdash;
-      <span class='desc'>The <em>this</em> scope to apply to the callback method</span>
-    </li>
   </ul>
 </div>
   </div>
   <div class='method_details'>
     <p class='signature' id='removeEventListener-instance'>
-      - (void) <strong>removeEventListener</strong>(eventType, method, thisScope)
+      - (void) <strong>removeEventListener</strong>(eventType, method)
     </p>
     <div class='docstring'>
   <p>Removes registered method for specified eventType.</p>
@@ -237,7 +230,7 @@
         (<tt>String</tt>)
       </span>
       &mdash;
-      <span class='desc'>Event type / name</span>
+      <span class='desc'><code>Event</code> type</span>
     </li>
     <li>
       <span class='name'>method</span>
@@ -245,15 +238,7 @@
         (<tt>Function</tt>)
       </span>
       &mdash;
-      <span class='desc'>Function</span>
-    </li>
-    <li>
-      <span class='name'>thisScope</span>
-      <span class='type'>
-        (<tt>Object</tt>)
-      </span>
-      &mdash;
-      <span class='desc'>The <em>this</em> scope to apply to the callback method</span>
+      <span class='desc'>Function accepting 1 parameter of type <code>Event</code></span>
     </li>
   </ul>
 </div>
@@ -263,7 +248,7 @@
       - (void) <strong>dispatchEvent</strong>(event)
     </p>
     <div class='docstring'>
-  <p>Invokes all registered methods for specified event.</p>
+  <p>Dispatches the specified <code>Event</code> and notifies all listeners.</p>
 </div>
 <div class='tags'>
   <h3>Parameters:</h3>
@@ -274,7 +259,7 @@
         (<tt><a href='../classes/Event.html'>Event</a></tt>)
       </span>
       &mdash;
-      <span class='desc'>Event to dispatch</span>
+      <span class='desc'><code>Event</code> to dispatch</span>
     </li>
   </ul>
 </div>
@@ -284,7 +269,7 @@
       - (void) <strong>hasEventListeners</strong>(eventType)
     </p>
     <div class='docstring'>
-  <p>Returns true if there are any methods registered for specified eventType.</p>
+  <p>Returns true if there are any methods registered for specified <code>Event</code> type.</p>
 </div>
 <div class='tags'>
   <h3>Parameters:</h3>
@@ -295,7 +280,7 @@
         (<tt>String</tt>)
       </span>
       &mdash;
-      <span class='desc'>Event type / name</span>
+      <span class='desc'><code>Event</code> type</span>
     </li>
   </ul>
 </div>
@@ -305,7 +290,7 @@
       - (void) <strong>removeAllEventListeners</strong>()
     </p>
     <div class='docstring'>
-  <p>Removes all registered methods.</p>
+  <p>Removes all event listeners.</p>
 </div>
 <div class='tags'>
 </div>
@@ -314,7 +299,7 @@
     </div>
     <div id='footer'>
   Generated on
-  Thu May 16 2013 20:17:13 GMT-0400 (EDT)
+  Thu May 16 2013 21:03:38 GMT-0400 (EDT)
   by
   <a href='https://github.com/netzpirat/codo' title='CoffeeScript API documentation generator'>Codo</a>
   v1.6.2

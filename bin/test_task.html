@@ -48,9 +48,9 @@
 				withStartHandler( taskStartHandler ).
 				withCompleteHandler( taskCompleteHandler );
 			
-			taskA.addEventListener( TaskEvent.COMPLETE, eventHandler, this );
-			taskB.addEventListener( TaskEvent.COMPLETE, eventHandler, this );
-			taskC.addEventListener( TaskEvent.COMPLETE, eventHandler, this );
+			taskA.addEventListener( TaskEvent.COMPLETE, new Proxy( eventHandler, this ) );
+			taskB.addEventListener( TaskEvent.COMPLETE, new Proxy( eventHandler, this ) );
+			taskC.addEventListener( TaskEvent.COMPLETE, new Proxy( eventHandler, this ) );
 			
 			new CompositeTask( [ taskA, taskB, taskC ], executeTaskInParallel, "Composite task" ).
 				withStartHandler( taskStartHandler ).

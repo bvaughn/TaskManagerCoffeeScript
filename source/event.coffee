@@ -1,5 +1,8 @@
 ###
-# Base class for events. #
+Simple event.
+This type of object can be dispatched by an `EventDispatcher`.
+
+You can extend this class to implement a custom event if you wish to bundle additional data.
 
 @author [Brian Vaughn](http://www.briandavidvaughn.com)
 ###
@@ -9,12 +12,15 @@ class Event
   set = (props) => @::__defineSetter__ name, setter for name, setter of props
 
   ###
-  This is the constructor.
-  @param [String] event type/name
-  @param [Object] optional event data
+  Constructor.
+  @param type [String] Unique `Event` type
   ###
-  constructor: (@eventType, @data) ->
+  constructor: ( type ) ->
+    @_type = type
+    
+  # @property [EventDispatcher] Object that dispatched this `Event`
+  get dispatcher: -> @_dispatcher
+  set dispatcher: (@_dispatcher) ->
 
-  # @property [EventDispatcher] Dispatcher of this Event
-  get target: -> @_target
-  set target: (@_target) ->
+  # @property [String] Type of event
+  get type: -> @_type

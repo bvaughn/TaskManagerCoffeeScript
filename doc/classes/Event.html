@@ -115,8 +115,8 @@
       </table>
       <h2>Overview</h2>
       <div class='docstring'>
-  <h1>Base class for events.</h1>
-
+  <p>Simple event.
+This type of object can be dispatched by an <code>EventDispatcher</code>.</p><p>You can extend this class to implement a custom event if you wish to bundle additional data.</p>
 </div>
 <div class='tags'>
   <h3>Author:</h3>
@@ -132,13 +132,22 @@
       </p>
       <h2>Property Summary</h2>
       <dl class='properties'>
-        <dt id='target-property'>
+        <dt id='dispatcher-property'>
           <span class='signature'>
-            (EventDispatcher) <strong>target</strong>
+            (EventDispatcher) <strong>dispatcher</strong>
           </span>
         </dt>
         <dd class='desc'>
-          <p>Dispatcher of this Event</p>
+          <p>Object that dispatched this <code>Event</code></p>
+        </dd>
+        <dt id='type-property'>
+          <span class='signature'>
+            (String) <strong>type</strong>
+          </span>
+          <span class='note readonly title'>Readonly</span>
+        </dt>
+        <dd class='desc'>
+          <p>Type of event</p>
         </dd>
       </dl>
       <h2>Instance Method Summary</h2>
@@ -146,12 +155,12 @@
   <li>
     <span class='signature'>
       <a href='#constructor-instance'>
-        - (void) <strong>constructor</strong>(eventType, data)
+        - (void) <strong>constructor</strong>(type)
       </a>
     </span>
     <span class='constructor note title'>Constructor</span>
     <span class='desc'>
-      This is the constructor.
+      Constructor.
     </span>
   </li>
 </ul>
@@ -159,29 +168,21 @@
       <div class='methods'>
   <div class='method_details'>
     <p class='signature' id='constructor-instance'>
-      - (void) <strong>constructor</strong>(eventType, data)
+      - (void) <strong>constructor</strong>(type)
     </p>
     <div class='docstring'>
-  <p>This is the constructor.</p>
+  <p>Constructor.</p>
 </div>
 <div class='tags'>
   <h3>Parameters:</h3>
   <ul class='param'>
     <li>
-      <span class='name'>event</span>
+      <span class='name'>type</span>
       <span class='type'>
         (<tt>String</tt>)
       </span>
       &mdash;
-      <span class='desc'>type/name</span>
-    </li>
-    <li>
-      <span class='name'>optional</span>
-      <span class='type'>
-        (<tt>Object</tt>)
-      </span>
-      &mdash;
-      <span class='desc'>event data</span>
+      <span class='desc'>Unique <code>Event</code> type</span>
     </li>
   </ul>
 </div>
@@ -190,7 +191,7 @@
     </div>
     <div id='footer'>
   Generated on
-  Thu May 16 2013 20:17:13 GMT-0400 (EDT)
+  Thu May 16 2013 21:03:38 GMT-0400 (EDT)
   by
   <a href='https://github.com/netzpirat/codo' title='CoffeeScript API documentation generator'>Codo</a>
   v1.6.2
