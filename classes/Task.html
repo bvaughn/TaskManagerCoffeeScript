@@ -1,0 +1,887 @@
+<!DOCTYPE html>
+<html>
+  <head>
+  <meta charset='UTF-8'>
+  <title>CoffeeScript API Documentation</title>
+  <link rel='stylesheet' href='../assets/codo.css' type='text/css'>
+  <script src='../assets/codo.js'></script>
+  <script src='../assets/search_data.js'></script>
+</head>
+  <body>
+    <div id='base' data-path='../'></div>
+<div id='header'>
+  <div id='menu'>
+    <a href='../README.md.html' title='TaskManagerCoffeeScript'>TaskManagerCoffeeScript</a>
+    &raquo;
+    <a href='../class_index.html' title='Index'>Index</a>
+    &raquo;
+    <span class='title'>Task</span>
+    <nav>
+      <ul>
+        <li class='noframes'>
+          (<a class='noframes' href='#'>no frames</a>)
+        </li>
+      </ul>
+    </nav>
+    <div id='search'>
+      <a id='class_list_link' href='../class_list.html'>Classes</a>
+      <a id='method_list_link' href='../method_list.html'>Methods</a>
+      <a id='extra_list_link' href='../extra_list.html'>Extras</a>
+    </div>
+  </div>
+  <iframe id='search_frame'></iframe>
+  <div id='fuzzySearch'>
+    <input type='text'>
+    <ol></ol>
+  </div>
+  <div id='help'>
+    <p>
+      Quickly fuzzy find classes, mixins, methods, file:
+    </p>
+    <ul>
+      <li>
+        <span>Ctrl-T</span>
+        Open fuzzy finder dialog
+      </li>
+    </ul>
+    <p>
+      In frame mode you can toggle the list naviation frame on the left side:
+    </p>
+    <ul>
+      <li>
+        <span>Ctrl-L</span>
+        Toggle list view
+      </li>
+    </ul>
+    <p>
+      You can focus a list in frame mode or toggle a tab in frameless mode:
+    </p>
+    <ul>
+      <li>
+        <span>Ctrl-C</span>
+        Class list
+      </li>
+      <li>
+        <span>Ctrl-I</span>
+        Mixin list
+      </li>
+      <li>
+        <span>Ctrl-F</span>
+        File list
+      </li>
+      <li>
+        <span>Ctrl-M</span>
+        Method list
+      </li>
+      <li>
+        <span>Ctrl-E</span>
+        Extras list
+      </li>
+    </ul>
+    <p>
+      You can focus and blur the search input:
+    </p>
+    <ul>
+      <li>
+        <span>Ctrl-S</span>
+        Focus search input
+      </li>
+      <li>
+        <span>Esc</span>
+        Blur search input
+      </li>
+    </ul>
+    <p>
+      In frameless mode you can close the list tab:
+    </p>
+    <ul>
+      <li>
+        <span>Esc</span>
+        Close list tab
+      </li>
+    </ul>
+  </div>
+</div>
+    <div id='content'>
+      <h1>
+        Class:
+        Task
+      </h1>
+      <table class='box'>
+        <tr>
+          <td>Defined in:</td>
+          <td>.&#47;source&#47;task.coffee</td>
+        </tr>
+        <tr>
+          <td>Inherits:</td>
+          <td>
+            <a href='../classes/EventDispatcher.html'>EventDispatcher</a>
+          </td>
+        </tr>
+      </table>
+      <h2>Overview</h2>
+      <div class='docstring'>
+  <p>A Task is any operation that can be started and completed.
+A Task may be a self-contained operation or it may be a composite of many such other Tasks.</p><p>To create a usable Task, extend this class and override the <strong>customRun()</strong>, <strong>customReset()</strong>, and <strong>customInterrupt()</strong> methods.
+Your Task should call taskComplete() or taskError() upon completion.</p>
+</div>
+<div class='tags'>
+  <h3>Author:</h3>
+  <ul class='author'>
+    <li>
+      <a href="http://www.briandavidvaughn.com">Brian Vaughn</a>
+    </li>
+  </ul>
+</div>
+      <h2>Direct Known Subclasses</h2>
+      <p class='children'>
+                <a href='../classes/CompositeTask.html'>CompositeTask</a>,
+        <a href='../classes/TaskWithClosure.html'>TaskWithClosure</a>
+      </p>
+      <h2>Property Summary</h2>
+      <dl class='properties'>
+        <dt id='completed-property'>
+          <span class='signature'>
+            (Boolean) <strong>completed</strong>
+          </span>
+          <span class='note readonly title'>Readonly</span>
+        </dt>
+        <dd class='desc'>
+          <p>The current task has successfully completed execution.</p>
+        </dd>
+        <dt id='data-property'>
+          <span class='signature'>
+            (Object) <strong>data</strong>
+          </span>
+          <span class='note readonly title'>Readonly</span>
+        </dt>
+        <dd class='desc'>
+          <p>Optional data resulting from Task completion or failure.</p>
+        </dd>
+        <dt id='errored-property'>
+          <span class='signature'>
+            (Boolean) <strong>errored</strong>
+          </span>
+          <span class='note readonly title'>Readonly</span>
+        </dt>
+        <dd class='desc'>
+          <p>The current Task failed.</p>
+        </dd>
+        <dt id='id-property'>
+          <span class='signature'>
+            (Integer) <strong>id</strong>
+          </span>
+          <span class='note readonly title'>Readonly</span>
+        </dt>
+        <dd class='desc'>
+          <p>Unique ID for a Task.</p>
+        </dd>
+        <dt id='interrupted-property'>
+          <span class='signature'>
+            (Boolean) <strong>interrupted</strong>
+          </span>
+          <span class='note readonly title'>Readonly</span>
+        </dt>
+        <dd class='desc'>
+          <p>The task has been interrupted and has not yet resumed.</p>
+        </dd>
+        <dt id='interruptingTask-property'>
+          <span class='signature'>
+            (Task) <strong>interruptingTask</strong>
+          </span>
+          <span class='note readonly title'>Readonly</span>
+        </dt>
+        <dd class='desc'>
+          <p>The Task currently interrupting the this Task&#39;s execution (or NULL if no such Task exists).</p>
+        </dd>
+        <dt id='message-property'>
+          <span class='signature'>
+            (String) <strong>message</strong>
+          </span>
+          <span class='note readonly title'>Readonly</span>
+        </dt>
+        <dd class='desc'>
+          <p>Optional message resulting from Task completion or failure.</p>
+        </dd>
+        <dt id='numInternalOperations-property'>
+          <span class='signature'>
+            (Integer) <strong>numInternalOperations</strong>
+          </span>
+          <span class='note readonly title'>Readonly</span>
+        </dt>
+        <dd class='desc'>
+          <p>Number of internal operations conducted by this task.
+Sub-classes should override this method if containing a value &gt; 1;</p>
+        </dd>
+        <dt id='numInternalOperationsCompleted-property'>
+          <span class='signature'>
+            (Integer) <strong>numInternalOperationsCompleted</strong>
+          </span>
+          <span class='note readonly title'>Readonly</span>
+        </dt>
+        <dd class='desc'>
+          <p>Number of internal operations that have completed.
+Sub-classes should override this method if containing a value &gt; 1;</p>
+        </dd>
+        <dt id='numInternalOperationsPending-property'>
+          <span class='signature'>
+            (Integer) <strong>numInternalOperationsPending</strong>
+          </span>
+          <span class='note readonly title'>Readonly</span>
+        </dt>
+        <dd class='desc'>
+          <p>Number of internal operations not yet completed.</p>
+        </dd>
+        <dt id='numTimesCompleted-property'>
+          <span class='signature'>
+            (Integer) <strong>numTimesCompleted</strong>
+          </span>
+          <span class='note readonly title'>Readonly</span>
+        </dt>
+        <dd class='desc'>
+          <p>Number of times this task has completed.</p>
+        </dd>
+        <dt id='numTimesErrored-property'>
+          <span class='signature'>
+            (Integer) <strong>numTimesErrored</strong>
+          </span>
+          <span class='note readonly title'>Readonly</span>
+        </dt>
+        <dd class='desc'>
+          <p>Number of times this task has errored.</p>
+        </dd>
+        <dt id='numTimesInterrupted-property'>
+          <span class='signature'>
+            (Integer) <strong>numTimesInterrupted</strong>
+          </span>
+          <span class='note readonly title'>Readonly</span>
+        </dt>
+        <dd class='desc'>
+          <p>Number of times this task has been interrupted.</p>
+        </dd>
+        <dt id='numTimesReset-property'>
+          <span class='signature'>
+            (Integer) <strong>numTimesReset</strong>
+          </span>
+          <span class='note readonly title'>Readonly</span>
+        </dt>
+        <dd class='desc'>
+          <p>Number of times this task has been reset.
+This is the only counter that is not reset by the reset() method.</p>
+        </dd>
+        <dt id='numTimesStarted-property'>
+          <span class='signature'>
+            (Integer) <strong>numTimesStarted</strong>
+          </span>
+          <span class='note readonly title'>Readonly</span>
+        </dt>
+        <dd class='desc'>
+          <p>Number of times this task has been started.</p>
+        </dd>
+        <dt id='running-property'>
+          <span class='signature'>
+            (Boolean) <strong>running</strong>
+          </span>
+          <span class='note readonly title'>Readonly</span>
+        </dt>
+        <dd class='desc'>
+          <p>The task is currently running.
+This value is FALSE if the task has not been run, has completed run (succesfully or due to a failure), or has been interrupted.</p>
+        </dd>
+        <dt id='synchronous-property'>
+          <span class='signature'>
+            (Boolean) <strong>synchronous</strong>
+          </span>
+          <span class='note readonly title'>Readonly</span>
+        </dt>
+        <dd class='desc'>
+          <p>The current task can be executed synchronously.</p>
+        </dd>
+        <dt id='taskIdentifier-property'>
+          <span class='signature'>
+            (String) <strong>taskIdentifier</strong>
+          </span>
+        </dt>
+        <dd class='desc'>
+          <p>(Optional) human-readable label for task.</p>
+        </dd>
+      </dl>
+      <h2>Instance Method Summary</h2>
+      <ul class='summary'>
+  <li>
+    <span class='signature'>
+      <a href='#constructor-instance'>
+        - (void) <strong>constructor</strong>(_taskIdentifier)
+      </a>
+    </span>
+    <span class='constructor note title'>Constructor</span>
+    <span class='desc'>
+      Constructor
+    </span>
+  </li>
+  <li>
+    <span class='signature'>
+      <a href='#reset-instance'>
+        - (Task) <strong>reset</strong>()
+      </a>
+    </span>
+    <span class='desc'>
+      Resets the task to it&#39;s pre-run state.
+    </span>
+  </li>
+  <li>
+    <span class='signature'>
+      <a href='#run-instance'>
+        - (Task) <strong>run</strong>()
+      </a>
+    </span>
+    <span class='desc'>
+      Starts a task.
+    </span>
+  </li>
+  <li>
+    <span class='signature'>
+      <a href='#customRun-instance'>
+        - (void) <strong>customRun</strong>()
+      </a>
+    </span>
+    <span class='desc'>
+      Override this method to give your Task functionality.
+    </span>
+  </li>
+  <li>
+    <span class='signature'>
+      <a href='#customInterrupt-instance'>
+        - (void) <strong>customInterrupt</strong>()
+      </a>
+    </span>
+    <span class='desc'>
+      Sub-classes should override this method to implement interruption behavior (removing event listeners, pausing objects, etc.).
+    </span>
+  </li>
+  <li>
+    <span class='signature'>
+      <a href='#customReset-instance'>
+        - (void) <strong>customReset</strong>()
+      </a>
+    </span>
+    <span class='desc'>
+      Override this method to perform any custom reset operations.
+    </span>
+  </li>
+  <li>
+    <span class='signature'>
+      <a href='#withCompleteHandler-instance'>
+        - (void) <strong>withCompleteHandler</strong>(methodOrProxy)
+      </a>
+    </span>
+    <span class='desc'>
+      The provided function will be invoked only upon successful completion of the task.
+    </span>
+  </li>
+  <li>
+    <span class='signature'>
+      <a href='#removeCompleteHandler-instance'>
+        - (void) <strong>removeCompleteHandler</strong>(methodOrProxy)
+      </a>
+    </span>
+    <span class='desc'>
+      Removes a registered Task-completed handler.
+    </span>
+  </li>
+  <li>
+    <span class='signature'>
+      <a href='#withErrorHandler-instance'>
+        - (void) <strong>withErrorHandler</strong>(methodOrProxy)
+      </a>
+    </span>
+    <span class='desc'>
+      The provided function will be invoked only upon failure of the task.
+    </span>
+  </li>
+  <li>
+    <span class='signature'>
+      <a href='#removeErrorHandler-instance'>
+        - (void) <strong>removeErrorHandler</strong>(methodOrProxy)
+      </a>
+    </span>
+    <span class='desc'>
+      Removes a registered Task-errorred handler.
+    </span>
+  </li>
+  <li>
+    <span class='signature'>
+      <a href='#withFinalHandler-instance'>
+        - (void) <strong>withFinalHandler</strong>(methodOrProxy)
+      </a>
+    </span>
+    <span class='desc'>
+      This handler is invoked upon either success or failure of the Task.
+    </span>
+  </li>
+  <li>
+    <span class='signature'>
+      <a href='#removeFinalHandler-instance'>
+        - (void) <strong>removeFinalHandler</strong>(methodOrProxy)
+      </a>
+    </span>
+    <span class='desc'>
+      Removes a registered final handler.
+    </span>
+  </li>
+  <li>
+    <span class='signature'>
+      <a href='#withInterruptHandler-instance'>
+        - (void) <strong>withInterruptHandler</strong>(methodOrProxy)
+      </a>
+    </span>
+    <span class='desc'>
+      The provided function will be invoked only upon interruption of the Task.
+    </span>
+  </li>
+  <li>
+    <span class='signature'>
+      <a href='#removeInterruptHandler-instance'>
+        - (void) <strong>removeInterruptHandler</strong>(methodOrProxy)
+      </a>
+    </span>
+    <span class='desc'>
+      Removes a registered Task-interrupted handler.
+    </span>
+  </li>
+  <li>
+    <span class='signature'>
+      <a href='#withStartHandler-instance'>
+        - (void) <strong>withStartHandler</strong>(methodOrProxy)
+      </a>
+    </span>
+    <span class='desc'>
+      The provided function will be invoked each time the task is started (or re-started).
+    </span>
+  </li>
+  <li>
+    <span class='signature'>
+      <a href='#removeStartHandler-instance'>
+        - (void) <strong>removeStartHandler</strong>(methodOrProxy)
+      </a>
+    </span>
+    <span class='desc'>
+      Removes a registered Task-started handler.
+    </span>
+  </li>
+  <li>
+    <span class='signature'>
+      <a href='#taskComplete-instance'>
+        - (void) <strong>taskComplete</strong>(message = "", data = null)
+      </a>
+    </span>
+    <span class='desc'>
+      This method should be called upon Task completion.
+    </span>
+  </li>
+  <li>
+    <span class='signature'>
+      <a href='#taskError-instance'>
+        - (void) <strong>taskError</strong>(message = "", data = null)
+      </a>
+    </span>
+    <span class='desc'>
+      This method should be called upon Task failure.
+    </span>
+  </li>
+</ul>
+      <h2>
+        <small>Inherited Method Summary</small>
+      </h2>
+      <h3 class='inherited'>
+        Methods inherited from
+        <a href='../classes/EventDispatcher.html'>EventDispatcher</a>
+      </h3>
+      <p class='inherited'>
+                <a href='../classes/EventDispatcher.html#addEventListener-instance'>#addEventListener</a>,
+                <a href='../classes/EventDispatcher.html#removeEventListener-instance'>#removeEventListener</a>,
+                <a href='../classes/EventDispatcher.html#dispatchEvent-instance'>#dispatchEvent</a>,
+                <a href='../classes/EventDispatcher.html#hasEventListeners-instance'>#hasEventListeners</a>,
+        <a href='../classes/EventDispatcher.html#removeAllEventListeners-instance'>#removeAllEventListeners</a>
+      </p>
+      <h2>Constructor Details</h2>
+      <div class='methods'>
+  <div class='method_details'>
+    <p class='signature' id='constructor-instance'>
+      - (void) <strong>constructor</strong>(_taskIdentifier)
+    </p>
+    <div class='docstring'>
+  <p>Constructor</p>
+</div>
+<div class='tags'>
+  <h3>Parameters:</h3>
+  <ul class='param'>
+    <li>
+      <span class='name'>taskIdentifier</span>
+      <span class='type'>
+        (<tt>String</tt>)
+      </span>
+      &mdash;
+      <span class='desc'>Optional human-readable label for Task-instance; can be useful for debugging or logging purposes</span>
+    </li>
+  </ul>
+</div>
+  </div>
+</div>
+      <h2>Instance Method Details</h2>
+      <div class='methods'>
+  <div class='method_details'>
+    <p class='signature' id='reset-instance'>
+      - (Task) <strong>reset</strong>()
+    </p>
+    <div class='docstring'>
+  <p>Resets the task to it&#39;s pre-run state.
+This allows it to be re-run.
+This method can only be called on non-running tasks.</p>
+</div>
+<div class='tags'>
+  <h3>Returns:</h3>
+  <ul class='return'>
+    <li>
+      <span class='type'></span>
+      (<tt><a href='../classes/Task.html'>Task</a></tt>)
+      &mdash;
+      <span class='desc'>A reference to the current Task</span>
+    </li>
+  </ul>
+</div>
+  </div>
+  <div class='method_details'>
+    <p class='signature' id='run-instance'>
+      - (Task) <strong>run</strong>()
+    </p>
+    <div class='docstring'>
+  <p>Starts a task.
+This method may be used to retry an errored Task or to resume an interrupted Task.</p>
+</div>
+<div class='tags'>
+  <h3>Returns:</h3>
+  <ul class='return'>
+    <li>
+      <span class='type'></span>
+      (<tt><a href='../classes/Task.html'>Task</a></tt>)
+      &mdash;
+      <span class='desc'>A reference to the current Task</span>
+    </li>
+  </ul>
+</div>
+  </div>
+  <div class='method_details'>
+    <p class='signature' id='customRun-instance'>
+      - (void) <strong>customRun</strong>()
+    </p>
+    <div class='docstring'>
+  <p>Override this method to give your Task functionality.</p>
+</div>
+<div class='tags'>
+  <h3>Throws:</h3>
+  <ul class='throw'>
+    <li>
+      <span class='type'></span>
+      (<tt>?</tt>)
+      &mdash;
+      <span class='desc'>Error if not implemented</span>
+    </li>
+  </ul>
+</div>
+  </div>
+  <div class='method_details'>
+    <p class='signature' id='customInterrupt-instance'>
+      - (void) <strong>customInterrupt</strong>()
+    </p>
+    <div class='docstring'>
+  <p>Sub-classes should override this method to implement interruption behavior (removing event listeners, pausing objects, etc.).</p>
+</div>
+<div class='tags'>
+  <h3>Throws:</h3>
+  <ul class='throw'>
+    <li>
+      <span class='type'></span>
+      (<tt>?</tt>)
+      &mdash;
+      <span class='desc'>Error if not implemented</span>
+    </li>
+  </ul>
+</div>
+  </div>
+  <div class='method_details'>
+    <p class='signature' id='customReset-instance'>
+      - (void) <strong>customReset</strong>()
+    </p>
+    <div class='docstring'>
+  <p>Override this method to perform any custom reset operations.</p>
+</div>
+<div class='tags'>
+  <h3>Throws:</h3>
+  <ul class='throw'>
+    <li>
+      <span class='type'></span>
+      (<tt>Error</tt>)
+      &mdash;
+      <span class='desc'>Error if not implemented</span>
+    </li>
+  </ul>
+</div>
+  </div>
+  <div class='method_details'>
+    <p class='signature' id='withCompleteHandler-instance'>
+      - (void) <strong>withCompleteHandler</strong>(methodOrProxy)
+    </p>
+    <div class='docstring'>
+  <p>The provided function will be invoked only upon successful completion of the task.
+Function should accept 1 parameter of type <Task></p>
+</div>
+<div class='tags'>
+  <h3>Parameters:</h3>
+  <ul class='param'>
+    <li>
+      <span class='name'>methodOrProxy</span>
+      <span class='type'>
+        (<tt><a href='../classes/Proxy.html'>Proxy</a></tt>)
+      </span>
+      &mdash;
+      <span class='desc'>Function or Proxy; If a function is provided it will be converted to a Proxy with a &quot;this&quot; scope of this Task.</span>
+    </li>
+  </ul>
+</div>
+  </div>
+  <div class='method_details'>
+    <p class='signature' id='removeCompleteHandler-instance'>
+      - (void) <strong>removeCompleteHandler</strong>(methodOrProxy)
+    </p>
+    <div class='docstring'>
+  <p>Removes a registered Task-completed handler.</p>
+</div>
+<div class='tags'>
+  <h3>Parameters:</h3>
+  <ul class='param'>
+    <li>
+      <span class='name'>methodOrProxy</span>
+      <span class='type'>
+        (<tt><a href='../classes/Proxy.html'>Proxy</a></tt>)
+      </span>
+      &mdash;
+      <span class='desc'>Function or Proxy; If a function is provided it will be converted to a Proxy with a &quot;this&quot; scope of this Task.</span>
+    </li>
+  </ul>
+</div>
+  </div>
+  <div class='method_details'>
+    <p class='signature' id='withErrorHandler-instance'>
+      - (void) <strong>withErrorHandler</strong>(methodOrProxy)
+    </p>
+    <div class='docstring'>
+  <p>The provided function will be invoked only upon failure of the task.
+Function should accept 1 parameter of type <Task></p>
+</div>
+<div class='tags'>
+  <h3>Parameters:</h3>
+  <ul class='param'>
+    <li>
+      <span class='name'>methodOrProxy</span>
+      <span class='type'>
+        (<tt><a href='../classes/Proxy.html'>Proxy</a></tt>)
+      </span>
+      &mdash;
+      <span class='desc'>Function or Proxy; If a function is provided it will be converted to a Proxy with a &quot;this&quot; scope of this Task.</span>
+    </li>
+  </ul>
+</div>
+  </div>
+  <div class='method_details'>
+    <p class='signature' id='removeErrorHandler-instance'>
+      - (void) <strong>removeErrorHandler</strong>(methodOrProxy)
+    </p>
+    <div class='docstring'>
+  <p>Removes a registered Task-errorred handler.</p>
+</div>
+<div class='tags'>
+  <h3>Parameters:</h3>
+  <ul class='param'>
+    <li>
+      <span class='name'>methodOrProxy</span>
+      <span class='type'>
+        (<tt><a href='../classes/Proxy.html'>Proxy</a></tt>)
+      </span>
+      &mdash;
+      <span class='desc'>Function or Proxy; If a function is provided it will be converted to a Proxy with a &quot;this&quot; scope of this Task.</span>
+    </li>
+  </ul>
+</div>
+  </div>
+  <div class='method_details'>
+    <p class='signature' id='withFinalHandler-instance'>
+      - (void) <strong>withFinalHandler</strong>(methodOrProxy)
+    </p>
+    <div class='docstring'>
+  <p>This handler is invoked upon either success or failure of the Task.
+Function should accept 1 parameter of type <Task></p>
+</div>
+<div class='tags'>
+  <h3>Parameters:</h3>
+  <ul class='param'>
+    <li>
+      <span class='name'>methodOrProxy</span>
+      <span class='type'>
+        (<tt><a href='../classes/Proxy.html'>Proxy</a></tt>)
+      </span>
+      &mdash;
+      <span class='desc'>Function or Proxy; If a function is provided it will be converted to a Proxy with a &quot;this&quot; scope of this Task.</span>
+    </li>
+  </ul>
+</div>
+  </div>
+  <div class='method_details'>
+    <p class='signature' id='removeFinalHandler-instance'>
+      - (void) <strong>removeFinalHandler</strong>(methodOrProxy)
+    </p>
+    <div class='docstring'>
+  <p>Removes a registered final handler.</p>
+</div>
+<div class='tags'>
+  <h3>Parameters:</h3>
+  <ul class='param'>
+    <li>
+      <span class='name'>methodOrProxy</span>
+      <span class='type'>
+        (<tt><a href='../classes/Proxy.html'>Proxy</a></tt>)
+      </span>
+      &mdash;
+      <span class='desc'>Function or Proxy; If a function is provided it will be converted to a Proxy with a &quot;this&quot; scope of this Task.</span>
+    </li>
+  </ul>
+</div>
+  </div>
+  <div class='method_details'>
+    <p class='signature' id='withInterruptHandler-instance'>
+      - (void) <strong>withInterruptHandler</strong>(methodOrProxy)
+    </p>
+    <div class='docstring'>
+  <p>The provided function will be invoked only upon interruption of the Task.
+Function should accept 1 parameter of type <Task></p>
+</div>
+<div class='tags'>
+  <h3>Parameters:</h3>
+  <ul class='param'>
+    <li>
+      <span class='name'>methodOrProxy</span>
+      <span class='type'>
+        (<tt><a href='../classes/Proxy.html'>Proxy</a></tt>)
+      </span>
+      &mdash;
+      <span class='desc'>Function or Proxy; If a function is provided it will be converted to a Proxy with a &quot;this&quot; scope of this Task.</span>
+    </li>
+  </ul>
+</div>
+  </div>
+  <div class='method_details'>
+    <p class='signature' id='removeInterruptHandler-instance'>
+      - (void) <strong>removeInterruptHandler</strong>(methodOrProxy)
+    </p>
+    <div class='docstring'>
+  <p>Removes a registered Task-interrupted handler.</p>
+</div>
+<div class='tags'>
+  <h3>Parameters:</h3>
+  <ul class='param'>
+    <li>
+      <span class='name'>methodOrProxy</span>
+      <span class='type'>
+        (<tt><a href='../classes/Proxy.html'>Proxy</a></tt>)
+      </span>
+      &mdash;
+      <span class='desc'>Function or Proxy; If a function is provided it will be converted to a Proxy with a &quot;this&quot; scope of this Task.</span>
+    </li>
+  </ul>
+</div>
+  </div>
+  <div class='method_details'>
+    <p class='signature' id='withStartHandler-instance'>
+      - (void) <strong>withStartHandler</strong>(methodOrProxy)
+    </p>
+    <div class='docstring'>
+  <p>The provided function will be invoked each time the task is started (or re-started).
+Function should accept 1 parameter of type <Task></p>
+</div>
+<div class='tags'>
+  <h3>Parameters:</h3>
+  <ul class='param'>
+    <li>
+      <span class='name'>methodOrProxy</span>
+      <span class='type'>
+        (<tt><a href='../classes/Proxy.html'>Proxy</a></tt>)
+      </span>
+      &mdash;
+      <span class='desc'>Function or Proxy; If a function is provided it will be converted to a Proxy with a &quot;this&quot; scope of this Task.</span>
+    </li>
+  </ul>
+</div>
+  </div>
+  <div class='method_details'>
+    <p class='signature' id='removeStartHandler-instance'>
+      - (void) <strong>removeStartHandler</strong>(methodOrProxy)
+    </p>
+    <div class='docstring'>
+  <p>Removes a registered Task-started handler.</p>
+</div>
+<div class='tags'>
+  <h3>Parameters:</h3>
+  <ul class='param'>
+    <li>
+      <span class='name'>methodOrProxy</span>
+      <span class='type'>
+        (<tt><a href='../classes/Proxy.html'>Proxy</a></tt>)
+      </span>
+      &mdash;
+      <span class='desc'>Function or Proxy; If a function is provided it will be converted to a Proxy with a &quot;this&quot; scope of this Task.</span>
+    </li>
+  </ul>
+</div>
+  </div>
+  <div class='method_details'>
+    <p class='signature' id='taskComplete-instance'>
+      - (void) <strong>taskComplete</strong>(message = "", data = null)
+    </p>
+    <div class='docstring'>
+  <p>This method should be called upon Task completion.
+Typically this method should only be called by a Task, internally.
+It triggers complete handlers and toggles the Tasks&#39;s &quot;running&quot; and &quot;complete&quot; states.</p>
+</div>
+<div class='tags'>
+</div>
+  </div>
+  <div class='method_details'>
+    <p class='signature' id='taskError-instance'>
+      - (void) <strong>taskError</strong>(message = "", data = null)
+    </p>
+    <div class='docstring'>
+  <p>This method should be called upon Task failure.
+Typically this method should only be called by a Task, internally.
+It triggers complete handlers and toggles the Tasks&#39;s &quot;running&quot; and &quot;complete&quot; states.</p>
+</div>
+<div class='tags'>
+</div>
+  </div>
+</div>
+    </div>
+    <div id='footer'>
+  Generated on
+  Thu May 16 2013 21:03:38 GMT-0400 (EDT)
+  by
+  <a href='https://github.com/netzpirat/codo' title='CoffeeScript API documentation generator'>Codo</a>
+  v1.6.2
+  (Node.js v0.10.5).
+  &#10034;
+  Press Ctrl-h to see the keyboard shortcuts
+  &#10034;
+  <a href='http://twitter.com/#!/netzpirat'>@netzpirat</a>
+  &#10034;
+  <a href='https://mksoft.ch'>mksoft.ch</a>
+</div>
+  </body>
+</html>
